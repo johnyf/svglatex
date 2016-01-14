@@ -127,34 +127,23 @@ def export_from_svg(svg, out_type):
             # first export performed
             print('EPS file not found. New one to be created...')
     # export SVG-> PDF | EPS, if SVG newer
-    if flag == 0:
-        print('Exporting: .DOT-> .SVG ...\n')
-        if out_type == 'latex-pdf':
-            args = shlex.split(
-                'inkscape -z -D --file=' + svg +
-                ' --export-pdf=' + pdf + ' --export-latex')
-        elif out_type == 'pdf':
-            args = shlex.split(
-                'inkscape -z -D --file=' + svg +
-                ' --export-pdf=' + pdf)
-        elif out_type == 'latex-eps':
-            args = shlex.split(
-                'inkscape -z -D --file=' + svg +
-                ' --export-eps=' + eps + ' --export-latex')
-        elif out_type == 'eps':
-            args = shlex.split(
-                'inkscape -z -D --file=' + svg +
-                ' --export-eps=' + eps)
-        else:
-            raise sys.exit(
-                'No output option passed.'
-                'Available options: latex-pdf, latex-eps, pdf, eps')
-        # print(args)
-        subprocess.call(args)  # wait for export to prevent latex going
-        # on while inkscape is still working
-        print('Success: .SVG-> .PDF | .EPS.')
-    else:
+    if flag != 0:
         print('No update needed:\n\t PDF | EPS newer than SVG.')
+        return
+    print('Exporting: .DOT-> .SVG ...\n')
+    assert out_type in ('latex-pdf', 'pdf', 'latex-eps', 'eps'), (
+        'No output option passed.'
+        'Available options: latex-pdf, latex-eps, pdf, eps')
+    args = ['inkscape -z -D --file={svg}'.format(svg=svg)]
+    if 'pdf' in out_type:
+        args.append('--export-pdf={pdf}'.format(pdf=pdf))
+    if 'eps' in out_type:
+        args.append('--export-eps={eps}'.format(eps=eps))
+    if 'latex' in out_type:
+        args.append('--export-latex')
+    args = shlex.split(args)
+    subprocess.call(args)
+    print('Success: .SVG-> .PDF | .EPS.')
 
 
 def export_from_dot(dot):
