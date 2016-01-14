@@ -74,13 +74,11 @@ def locate(pattern, root=os.curdir):
 
 def export_from_svg(svg, out_type):
     """Export .SVG-> .PDF | .EPS."""
-    # assign svg, pdf, eps names
     svg = svg.replace('\\', '/')
     pdf = svg
     pdf = pdf.replace('.svg', '.pdf')
     eps = svg
     eps = eps.replace('.svg', '.eps')
-    # print(svg)
     # check .svg exists
     svg_exists = os.access(svg, os.F_OK)
     if svg_exists:
@@ -148,12 +146,9 @@ def export_from_svg(svg, out_type):
 
 def export_from_dot(dot):
     """Export .DOT-> .SVG."""
-    # assign dot, svg names
     dot = dot.replace('\\', '/')
     svg = dot
     svg = svg.replace('dot', '.svg')
-    # print(dot)
-    # print(svg)
     # check .dot exists
     dot_exists = os.access(dot, os.F_OK)
     if dot_exists:
@@ -192,8 +187,7 @@ def export_from_dot(dot):
 
 
 def help_text():
-    # print('Python executable: '+sys.executable)
-    raise sys.exit(
+    raise Exception(
         'Input missing.\n'
         'Usage:\n'
         '\t inkscape2tex.py --input-file filename --method type\n'
@@ -224,7 +218,6 @@ def main(argv):
             filename = arg
         elif opt in ('-m', '--method'):
             out_type = arg
-    # print(filename, out_type)
     # dot file ?
     flag = 1
     if out_type == 'dot-svg-latex-pdf':
