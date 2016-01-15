@@ -1,51 +1,55 @@
 #!/usr/bin/env python
-"""Convert inkscape svg files to tex input.
+"""Convert inkscape SVG files to TeX input.
 
-convert:
-    1) DOT-> SVG
-    2) SVG-> PDF |EPS with inkscape (optional: w latex output)
+Can be used to convert:
 
-installation:
-    install python 3
-    instal inkscape (should be in path)
+  1. DOT to SVG
+  2. SVG to PDF or EPS with inkscape,
+     optionally with LaTeX output
 
-usage:
+Requires `inkscape` in path.
 
- 1) inkscape2tex.py filename -latex
+Usage
+=====
 
-    checks if filename.svg is in a directory tree below ./img
-    for all matches it tries to find filename.pdf in the same path
-    if there is not a pdf it generates a pdf from the svg using inkscape.
-    if there is a pdf, it checks the modification dates.
-    if the pdf was last modified after the svg then it does nothing.
-    if the pdf was last modified before the svg then it generates the pdf again
-    and overwrites the old pdf.
-    Using the -latex option exports a .pdf_tex latex file
-    containing the svg's text and a
-    .pdf which is imported in latex by the code within .pdf_tex.
-    In your document you should input the .pdf_tex, which is done automatically
-    by the command: \includesvg[]{} provided in latex.
+  1. `inkscape2tex.py filename -latex`
 
- 2) inkscape.py filename -pdf
-    the same as above, except only a pdf is created from the svg.
-    The latex command achieving this is \includesvgpdf[]{}
+     checks if filename.svg is in a directory tree below ./img
+     for all matches it tries to find filename.pdf in the same path
+     if there is not a pdf it generates a pdf from the svg using inkscape.
+     if there is a pdf, it checks the modification dates.
+     if the pdf was last modified after the svg then it does nothing.
+     if the pdf was last modified before the svg then
+     it generates the pdf again
+     and overwrites the old pdf.
+     Using the -latex option exports a .pdf_tex latex file
+     containing the svg's text and a
+     .pdf which is imported in latex by the code within .pdf_tex.
+     In your document you should input the .pdf_tex,
+     which is done automatically
+     by the command: \includesvg[]{} provided in latex.
 
- 3) inkscape.py ./img/dir/myother/fig -pdf
-    no search. The specified file is used. Rest is the same.
+  2. `inkscape.py filename -pdf`
+     the same as above, except only a pdf is created from the svg.
+     The latex command achieving this is \includesvgpdf[]{}
 
- 4) Other options
-   -latex-pdf, -latex-eps
+  3. `inkscape.py ./img/dir/myother/fig -pdf`
+     no search. The specified file is used. Rest is the same.
 
+  4. Other options
+     `-latex-pdf, -latex-eps`
 
-notes
- 1) filename can contain python regular expressions.
-    this comes handy for auto conversion of entire directory tries
-    mostly when batch processing and not from within latex.
+Notes
+=====
 
- 2) Caution: the assumptions made are that
-    i) you either provide a filename without extension which is an svg
-       or if a path precedes it, it is a relative path starting with ./img
-    ii) you want to extract to pdf (and not eps)
+  1. filename can contain python regular expressions.
+     this comes handy for auto conversion of entire directory tries
+     mostly when batch processing and not from within latex.
+
+  2. Caution: the assumptions made are that
+     i. you either provide a filename without extension which is an svg
+        or if a path precedes it, it is a relative path starting with ./img
+     ii. you want to extract to pdf (and not eps)
 """
 import sys
 import shlex
@@ -200,7 +204,10 @@ def help_text():
 
 
 def main(argv):
-    print('\n------------------\n inkscape2tex\n------------------\n')
+    print(
+        '\n------------------\n'
+        'inkscape2tex'
+        '\n------------------\n')
     try:
         opts, args = getopt.getopt(
             argv, 'hi:m:', ["help", "input-file=", "method="])
@@ -257,5 +264,5 @@ def main(argv):
     print('\n------------------\n')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main(sys.argv[1:])
