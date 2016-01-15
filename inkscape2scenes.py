@@ -1,4 +1,4 @@
-#! /opt/local/bin/python3.3#
+#!/usr/bin/env python
 
 # Purpose:   convert SVG to PDF with inkscape, with latex output enabled or not
 # Author:    Ioannis Filippidis
