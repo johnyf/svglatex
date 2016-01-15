@@ -1,0 +1,13 @@
+% test integration of `inkscape2tex.py` with `mycommands.sty`.
+\documentclass[10pt]{article}
+\usepackage{graphicx}
+\usepackage{mycommands}
+\graphicspath{{./img/}}
+\begin{document}
+\begin{figure}
+\centering
+\includesvg[width=0.6\textwidth]{./img/beautiful}
+\caption{Nice caption.}
+\label{fig:label}
+\end{figure}
+\end{document}
