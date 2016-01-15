@@ -136,7 +136,7 @@ def export_from_svg(svg, out_type):
             print('EPS file not found. New one to be created...')
     # export SVG-> PDF | EPS, if SVG newer
     if flag != 0:
-        print('No update needed:\n\t PDF | EPS newer than SVG.')
+        print('No update needed, PDF or EPS newer than SVG.')
         return
     print('Exporting from SVG...\n')
     assert out_type in ('latex-pdf', 'pdf', 'latex-eps', 'eps'), (
