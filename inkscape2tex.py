@@ -50,6 +50,12 @@ Notes
      i. you either provide a filename without extension which is an svg
         or if a path precedes it, it is a relative path starting with ./img
      ii. you want to extract to pdf (and not eps)
+
+
+License
+=======
+
+Copyright (BSD-2) 2010-2016 by Ioannis Filippidis
 """
 import sys
 import shlex
