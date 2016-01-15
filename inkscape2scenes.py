@@ -21,7 +21,7 @@ background, layer2 * 0.5, layer3 * 0.5, layer5
 License
 =======
 
-Copyright (GPLv3) 2010--2016 by Ioannis Filippidis
+Copyright (GPLv3) 2010-2016 by Ioannis Filippidis
 
 Based on:  InkscapeSlide 1.0 by Alexandre Bourget
 GPLv3 Copyright (c) 2008 by Alexandre Bourget
