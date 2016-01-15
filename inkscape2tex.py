@@ -149,7 +149,7 @@ def export_from_svg(svg, out_type):
         args.append('--export-eps={eps}'.format(eps=eps))
     if 'latex' in out_type:
         args.append('--export-latex')
-    args = shlex.split(args)
+    args = shlex.split(' '.join(args))
     subprocess.call(args)
     print('Success: .SVG-> .PDF | .EPS.')
 
