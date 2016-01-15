@@ -138,7 +138,7 @@ def export_from_svg(svg, out_type):
     if flag != 0:
         print('No update needed:\n\t PDF | EPS newer than SVG.')
         return
-    print('Exporting: .DOT-> .SVG ...\n')
+    print('Exporting from SVG...\n')
     assert out_type in ('latex-pdf', 'pdf', 'latex-eps', 'eps'), (
         'No output option passed.'
         'Available options: latex-pdf, latex-eps, pdf, eps')
