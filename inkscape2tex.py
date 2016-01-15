@@ -236,8 +236,8 @@ def main(argv):
         else:
             file_generator = locate(dot_file, './img')
             for cur_dot_file in file_generator:
-                print('Found .dot file named: '
-                      + cur_dot_file + ', to export to .SVG')
+                print('Found .dot file named: ' +
+                      cur_dot_file + ', to export to .SVG')
                 export_from_dot(cur_dot_file)
                 flag = 0
         # switch to exporting SVG-> LaTeX - PDF
@@ -255,8 +255,8 @@ def main(argv):
     else:
         file_generator = locate(svg_file, './img')
         for cur_svg_file in file_generator:
-            print('Found .SVG file named: '
-                  + cur_svg_file + ' to export to ' + out_type)
+            print('Found .SVG file named: ' +
+                  cur_svg_file + ' to export to ' + out_type)
             export_from_svg(cur_svg_file, out_type)
             flag = 0
     if flag == 1:
