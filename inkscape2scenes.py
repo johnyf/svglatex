@@ -131,7 +131,7 @@ def main():
             "",
             "The opacity of a layer can be set to 50% for example by adding ",
             "'*0.5' after the layer name."]
-        print(s.join('\n'))
+        print('\n'.join(s))
         sys.exit(1)
     content = content_layer[0]
     # Find the text stuff, everything starting with SLIDE:
