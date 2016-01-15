@@ -98,7 +98,7 @@ def export_from_svg(svg, out_type):
          size, atime, svgmtime, ctime) = os.stat(svg)
     else:
         # it does not exist, nothing can be done
-        raise sys.exit('SVG file not found! Cannot produce PDF or EPS.')
+        raise Exception('SVG file not found! Cannot produce PDF or EPS.')
     flag = 0
     # check .pdf exists
     if (out_type == 'latex-pdf') or (out_type == 'pdf'):
@@ -168,7 +168,7 @@ def export_from_dot(dot):
          size, atime, dotmtime, ctime) = os.stat(dot)
     else:
         # it does not exist, nothing can be done
-        raise sys.exit('.DOT file not found! Cannot produce .SVG.')
+        raise Exception('.DOT file not found! Cannot produce .SVG.')
     flag = 0
     # check .svg exists
     svg_exists = os.access(svg, os.F_OK)
@@ -249,8 +249,7 @@ def main(argv):
         # switch to exporting SVG-> LaTeX - PDF
         out_type = 'latex-pdf'
         if flag == 1:
-            raise sys.exit('.DOT file not found! Cannot export to .SVG.')
-            sys.exit(1)
+            raise Exception('.DOT file not found! Cannot export to .SVG.')
         print('\n---------\n')
     # need to search fir .SVG, or relative path given ?
     flag = 1
@@ -266,7 +265,7 @@ def main(argv):
             export_from_svg(cur_svg_file, out_type)
             flag = 0
     if flag == 1:
-        raise sys.exit('.SVG file not found! Cannot export to .PDF.')
+        raise Exception('.SVG file not found! Cannot export to .PDF.')
     print('\n------------------\n')
 
 
