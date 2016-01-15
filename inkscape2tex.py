@@ -150,8 +150,8 @@ def export_from_svg(svg, out_type):
     if 'latex' in out_type:
         args.append('--export-latex')
     args = shlex.split(' '.join(args))
-    subprocess.call(args)
-    print('Success: .SVG-> .PDF | .EPS.')
+    r = subprocess.call(args)
+    assert r == 0, 'inkscape failed'
 
 
 def export_from_dot(dot):
