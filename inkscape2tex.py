@@ -101,7 +101,7 @@ def export_from_svg(svg, out_type):
         raise Exception('SVG file not found! Cannot produce PDF or EPS.')
     flag = 0
     # check .pdf exists
-    if (out_type == 'latex-pdf') or (out_type == 'pdf'):
+    if out_type == 'latex-pdf' or out_type == 'pdf':
         pdf_exists = os.access(pdf, os.F_OK)
         if pdf_exists:
             print('PDF file exists.')
@@ -118,7 +118,7 @@ def export_from_svg(svg, out_type):
             # first export performed
             print('PDF file not found. New one to be created...')
     # check .eps exists
-    if (out_type == 'latex-eps') or (out_type == 'eps'):
+    if out_type == 'latex-eps' or out_type == 'eps':
         eps_exists = os.access(eps, os.F_OK)
         if eps_exists:
             print('EPS file exists.')
