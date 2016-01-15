@@ -1,0 +1,14 @@
+% test `inkscape2tex.py` alone.
+\documentclass[10pt]{article}
+\usepackage{graphicx,color}
+\graphicspath{{./img/}}
+\begin{document}
+\begin{figure}
+\centering
+\def\svgwidth{0.6\textwidth}
+\immediate\write18{inkscape2tex.py -i ./img/beautiful -m latex-pdf}
+\input{./img/beautiful.pdf_tex}
+\caption{Nice caption.}
+\label{fig:label}
+\end{figure}
+\end{document}
