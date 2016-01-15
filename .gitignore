@@ -1,0 +1,8 @@
+*.pyc
+*.swp
+*.pdf
+*.pdf_tex
+*.log
+*.aux
+*.out
+
