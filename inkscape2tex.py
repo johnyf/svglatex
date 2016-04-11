@@ -142,7 +142,14 @@ def export_from_svg(svg, out_type):
     assert out_type in ('latex-pdf', 'pdf', 'latex-eps', 'eps'), (
         'No output option passed.'
         'Available options: latex-pdf, latex-eps, pdf, eps')
-    args = ['inkscape -z -D --file={svg}'.format(svg=svg)]
+    # inkscape need be called with an absolute path on OS X
+    # http://wiki.inkscape.org/wiki/index.php/MacOS_X
+    symlink_relpath = 'bin/inkscape'
+    home = os.path.expanduser('~')
+    symlink_abspath = os.path.join(home, symlink_relpath)
+    inkscape_abspath = os.path.realpath(symlink_abspath)
+    args = ['{inkscape_abspath} -z -D --file={svg}'.format(
+        inkscape_abspath=inkscape_abspath, svg=svg)]
     if 'pdf' in out_type:
         args.append('--export-pdf={pdf}'.format(pdf=pdf))
     if 'eps' in out_type:
