@@ -1,81 +1,25 @@
 #!/usr/bin/env python
 """Convert inkscape SVG files to TeX input.
 
-Can be used to convert:
+- SVG to PDF or EPS with inkscape, optionally with LaTeX output.
+- DOT to SVG
 
-  1. DOT to SVG
-  2. SVG to PDF or EPS with inkscape,
-     optionally with LaTeX output
-
+Skips conversion if PDF file found newer than SVG source.
 Requires `inkscape` in path.
-
-Usage
-=====
-
-  1. `inkscape2tex.py filename -latex`
-
-     checks if filename.svg is in a directory tree below ./img
-     for all matches it tries to find filename.pdf in the same path
-     if there is not a pdf it generates a pdf from the svg using inkscape.
-     if there is a pdf, it checks the modification dates.
-     if the pdf was last modified after the svg then it does nothing.
-     if the pdf was last modified before the svg then
-     it generates the pdf again
-     and overwrites the old pdf.
-     Using the -latex option exports a .pdf_tex latex file
-     containing the svg's text and a
-     .pdf which is imported in latex by the code within .pdf_tex.
-     In your document you should input the .pdf_tex,
-     which is done automatically
-     by the command: \includesvg[]{} provided in latex.
-
-  2. `inkscape.py filename -pdf`
-     the same as above, except only a pdf is created from the svg.
-     The latex command achieving this is \includesvgpdf[]{}
-
-  3. `inkscape.py ./img/dir/myother/fig -pdf`
-     no search. The specified file is used. Rest is the same.
-
-  4. Other options
-     `-latex-pdf, -latex-eps`
-
-Notes
-=====
-
-  1. filename can contain python regular expressions.
-     this comes handy for auto conversion of entire directory tries
-     mostly when batch processing and not from within latex.
-
-  2. Caution: the assumptions made are that
-     i. you either provide a filename without extension which is an svg
-        or if a path precedes it, it is a relative path starting with ./img
-     ii. you want to extract to pdf (and not eps)
-
-
 """
-import sys
 # Copyright 2010-2017 by Ioannis Filippidis
 # All rights reserved. Licensed under BSD-2.
 #
+import argparse
 import shlex
 import os
 import time
 import subprocess
 import fnmatch
-import getopt
 
 
 def locate(pattern, root=os.curdir):
-    """Locate all files matching supplied filename pattern in and
-    below supplied root directory.
-
-    locate() is used in case of exporting only to a .pdf (w/o latex export)
-    Only in that case \includegraphics{} is still able to find the .pdf
-    without a path.
-    If latex export is used, then the produced .pdf_tex should be used
-    with an \input{} command in latex and a relative path is mandatory for
-    the \input{} command to work.
-    """
+    """Locate all files matching supplied filename pattern under `root`."""
     for path, dirs, files in os.walk(os.path.abspath(root)):
         for filename in fnmatch.filter(files, pattern):
             yield os.path.join(path, filename)
@@ -160,58 +104,49 @@ def export_from_svg(svg, out_type):
     assert r == 0, 'inkscape failed'
 
 
-def help_text():
-    raise Exception(
-        'Input missing.\n'
-        'Usage:\n'
-        '\t inkscape2tex.py --input-file filename --method type\n'
-        '\t inkscape2tex.py -i filename -m type\n'
-        'where:\n\t filename = name (w/o extension) of SVG file under ./img'
-        '\n\t type = file-type to export to, available:'
-        '\n\t\t latex-pdf\n\t\t pdf'
-        '\n\t\t latex-eps\n\t\t eps'
-        '\n\t\t dot-svg-latex-pdf')
-
-
-def main(argv):
-    print(
-        '\n------------------\n'
-        'inkscape2tex'
-        '\n------------------\n')
-    try:
-        opts, args = getopt.getopt(
-            argv, 'hi:m:', ["help", "input-file=", "method="])
-    except getopt.GetoptError:
-        help_text()
-        sys.exit(2)
-    if len(opts) == 0:
-        help_text()
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt in ('-h', '--help'):
-            help_text()
-            sys.exit()
-        elif opt in ('-i', '--input-file'):
-            filename = arg
-        elif opt in ('-m', '--method'):
-            out_type = arg
-    # need to search fir .SVG, or relative path given ?
-    flag = 1
-    svg_file = filename + '.svg'
-    if './img/' in filename:
-        export_from_svg(svg_file, out_type)
-        flag = 0
+def main():
+    """Start from here."""
+    args = parse_args()
+    f = '{name}.svg'.format(name=args.input_file)
+    out_type = args.method
+    if './img/' in f:
+        files = [f]
     else:
-        file_generator = locate(svg_file, './img')
-        for cur_svg_file in file_generator:
-            print('Found .SVG file named: ' +
-                  cur_svg_file + ' to export to ' + out_type)
-            export_from_svg(cur_svg_file, out_type)
-            flag = 0
-    if flag == 1:
-        raise Exception('.SVG file not found! Cannot export to .PDF.')
-    print('\n------------------\n')
+        files = locate(f, './img')
+    svg = None
+    for svg in files:
+        print('Will convert SVG file "{f}" to {t}'.format(
+            f=svg, t=out_type))
+        export_from_svg(svg, out_type)
+    if svg is None:
+        raise Exception(
+            'SVG file "{f}" not found! '
+            'Cannot export to PDF.'.format(f=f))
+
+
+def parse_args():
+    """Parse command-line arguments using."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-i', '--input-file', type=str,
+        help=(
+            'Name (w/o extension) of SVG file. '
+            'Either file name to search for under `./img`, '
+            'or path that starts with `./img`.'))
+    choices = [
+        'latex-pdf', 'pdf',
+        'latex-eps', 'eps']
+    parser.add_argument(
+        '-m', '--method', type=str, choices=choices,
+        help=(
+            'Export to this file type. '
+            'The prefix "latex" produces also a file `*.pdf_tex` '
+            'that contains the text from the SVG. '
+            'The command `\includesvgpdf` passes `pdf`, '
+            'and `\includesvg` passes `latex-pdf`.'))
+    args = parser.parse_args()
+    return args
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
