@@ -18,11 +18,48 @@ import subprocess
 import fnmatch
 
 
-def locate(pattern, root=os.curdir):
-    """Locate all files matching supplied filename pattern under `root`."""
-    for path, dirs, files in os.walk(os.path.abspath(root)):
-        for filename in fnmatch.filter(files, pattern):
-            yield os.path.join(path, filename)
+def main():
+    """Start from here."""
+    args = parse_args()
+    f = '{name}.svg'.format(name=args.input_file)
+    out_type = args.method
+    if './img/' in f:
+        files = [f]
+    else:
+        files = locate(f, './img')
+    svg = None
+    for svg in files:
+        print('Will convert SVG file "{f}" to {t}'.format(
+            f=svg, t=out_type))
+        export_from_svg(svg, out_type)
+    if svg is None:
+        raise Exception(
+            'SVG file "{f}" not found! '
+            'Cannot export to PDF.'.format(f=f))
+
+
+def parse_args():
+    """Parse command-line arguments using."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-i', '--input-file', type=str,
+        help=(
+            'Name (w/o extension) of SVG file. '
+            'Either file name to search for under `./img`, '
+            'or path that starts with `./img`.'))
+    choices = [
+        'latex-pdf', 'pdf',
+        'latex-eps', 'eps']
+    parser.add_argument(
+        '-m', '--method', type=str, choices=choices,
+        help=(
+            'Export to this file type. '
+            'The prefix "latex" produces also a file `*.pdf_tex` '
+            'that contains the text from the SVG. '
+            'The command `\includesvgpdf` passes `pdf`, '
+            'and `\includesvg` passes `latex-pdf`.'))
+    args = parser.parse_args()
+    return args
 
 
 def export_from_svg(svg, out_type):
@@ -71,48 +108,11 @@ def export_from_svg(svg, out_type):
     assert r == 0, 'inkscape failed'
 
 
-def main():
-    """Start from here."""
-    args = parse_args()
-    f = '{name}.svg'.format(name=args.input_file)
-    out_type = args.method
-    if './img/' in f:
-        files = [f]
-    else:
-        files = locate(f, './img')
-    svg = None
-    for svg in files:
-        print('Will convert SVG file "{f}" to {t}'.format(
-            f=svg, t=out_type))
-        export_from_svg(svg, out_type)
-    if svg is None:
-        raise Exception(
-            'SVG file "{f}" not found! '
-            'Cannot export to PDF.'.format(f=f))
-
-
-def parse_args():
-    """Parse command-line arguments using."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-i', '--input-file', type=str,
-        help=(
-            'Name (w/o extension) of SVG file. '
-            'Either file name to search for under `./img`, '
-            'or path that starts with `./img`.'))
-    choices = [
-        'latex-pdf', 'pdf',
-        'latex-eps', 'eps']
-    parser.add_argument(
-        '-m', '--method', type=str, choices=choices,
-        help=(
-            'Export to this file type. '
-            'The prefix "latex" produces also a file `*.pdf_tex` '
-            'that contains the text from the SVG. '
-            'The command `\includesvgpdf` passes `pdf`, '
-            'and `\includesvg` passes `latex-pdf`.'))
-    args = parser.parse_args()
-    return args
+def locate(pattern, root=os.curdir):
+    """Locate all files matching supplied filename pattern under `root`."""
+    for path, dirs, files in os.walk(os.path.abspath(root)):
+        for filename in fnmatch.filter(files, pattern):
+            yield os.path.join(path, filename)
 
 
 if __name__ == '__main__':
