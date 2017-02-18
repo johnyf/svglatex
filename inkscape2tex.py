@@ -31,7 +31,7 @@ def main():
     for svg in files:
         print('Will convert SVG file "{f}" to {t}'.format(
             f=svg, t=out_type))
-        export_from_svg(svg, out_type)
+        convert_if_svg_newer(svg, out_type)
     if svg is None:
         raise Exception(
             'SVG file "{f}" not found! '
@@ -62,7 +62,7 @@ def parse_args():
     return args
 
 
-def export_from_svg(svg, out_type):
+def convert_if_svg_newer(svg, out_type):
     """Convert SVG file to PDF or EPS."""
     svg = svg.replace('\\', '/')
     if 'pdf' in out_type:
