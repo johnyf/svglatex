@@ -160,48 +160,6 @@ def export_from_svg(svg, out_type):
     assert r == 0, 'inkscape failed'
 
 
-def export_from_dot(dot):
-    """Export .DOT-> .SVG."""
-    dot = dot.replace('\\', '/')
-    svg = dot
-    svg = svg.replace('dot', '.svg')
-    # check .dot exists
-    dot_exists = os.access(dot, os.F_OK)
-    if dot_exists:
-        print('DOT file exists.')
-        # get last modification time
-        (mode, ino, dev, nlink, uid, gid,
-         size, atime, dotmtime, ctime) = os.stat(dot)
-    else:
-        # it does not exist, nothing can be done
-        raise Exception('.DOT file not found! Cannot produce .SVG.')
-    flag = 0
-    # check .svg exists
-    svg_exists = os.access(svg, os.F_OK)
-    if svg_exists:
-        print('SVG file exists.')
-        # get last modification time
-        (mode, ino, dev, nlink, uid, gid,
-         size, atime, svgmtime, ctime) = os.stat(svg)
-        print('\n last mod dates?\n\tDOT: %s\n\tSVG: %s\n'
-              % (time.ctime(dotmtime), time.ctime(svgmtime)))
-        # compare last modification dates
-        if (dotmtime < svgmtime):
-            flag = 1  # not modification needed
-    else:
-        # it does not exist, last modification check omitted,
-        # first export performed
-        print('.SVG file not found. New one to be created...')
-    # export if needed
-    if flag == 0:
-        print('Exporting: .DOT-> .SVG ...\n')
-        args = shlex.split('dot ' + dot + ' -Tsvg -o ' + svg)
-        subprocess.call(args)
-        print('Success: .DOT-> .SVG')
-    else:
-        print('No update needed:\n\t .SVG newer than .DOT.')
-
-
 def help_text():
     raise Exception(
         'Input missing.\n'
@@ -237,26 +195,6 @@ def main(argv):
             filename = arg
         elif opt in ('-m', '--method'):
             out_type = arg
-    # dot file ?
-    flag = 1
-    if out_type == 'dot-svg-latex-pdf':
-        # need to search for .DOT, or relative path given ?
-        if './img/' in filename:
-            dot_file = filename + '.dot'
-            export_from_dot(dot_file)
-            flag = 0
-        else:
-            file_generator = locate(dot_file, './img')
-            for cur_dot_file in file_generator:
-                print('Found .dot file named: ' +
-                      cur_dot_file + ', to export to .SVG')
-                export_from_dot(cur_dot_file)
-                flag = 0
-        # switch to exporting SVG-> LaTeX - PDF
-        out_type = 'latex-pdf'
-        if flag == 1:
-            raise Exception('.DOT file not found! Cannot export to .SVG.')
-        print('\n---------\n')
     # need to search fir .SVG, or relative path given ?
     flag = 1
     svg_file = filename + '.svg'
