@@ -105,7 +105,10 @@ def export_from_svg(svg, out_type):
         args.append('--export-latex')
     args = shlex.split(' '.join(args))
     r = subprocess.call(args)
-    assert r == 0, 'inkscape failed'
+    if r != 0:
+        raise Exception(
+            'conversion from "{svg}" to "{out}" failed'.format(
+                svg=svg, out=out))
 
 
 def locate(pattern, root=os.curdir):
