@@ -26,65 +26,32 @@ def locate(pattern, root=os.curdir):
 
 
 def export_from_svg(svg, out_type):
-    """Export .SVG-> .PDF | .EPS."""
+    """Convert SVG file to PDF or EPS."""
     svg = svg.replace('\\', '/')
-    pdf = svg
-    pdf = pdf.replace('.svg', '.pdf')
-    eps = svg
-    eps = eps.replace('.svg', '.eps')
-    # check .svg exists
-    svg_exists = os.access(svg, os.F_OK)
-    if svg_exists:
-        print('SVG file exists.')
-        # get last modification time
-        (mode, ino, dev, nlink, uid, gid,
-         size, atime, svgmtime, ctime) = os.stat(svg)
+    if 'pdf' in out_type:
+        out = svg.replace('.svg', '.pdf')
+    elif 'eps' in out_type:
+        out = svg.replace('.svg', '.eps')
     else:
-        # it does not exist, nothing can be done
-        raise Exception('SVG file not found! Cannot produce PDF or EPS.')
-    flag = 0
-    # check .pdf exists
-    if out_type == 'latex-pdf' or out_type == 'pdf':
-        pdf_exists = os.access(pdf, os.F_OK)
-        if pdf_exists:
-            print('PDF file exists.')
-            # get last modification time
-            (mode, ino, dev, nlink, uid, gid,
-             size, atime, pdfmtime, ctime) = os.stat(pdf)
-            print('\n last mod dates?\n\tSVG: %s\n\tPDF: %s\n'
-                  % (time.ctime(svgmtime), time.ctime(pdfmtime)))
-            # compare last modification dates
-            if (svgmtime < pdfmtime):
-                flag = 1
-        else:
-            # it does not exist, last modification check omitted,
-            # first export performed
-            print('PDF file not found. New one to be created...')
-    # check .eps exists
-    if out_type == 'latex-eps' or out_type == 'eps':
-        eps_exists = os.access(eps, os.F_OK)
-        if eps_exists:
-            print('EPS file exists.')
-            # get last modification time
-            (mode, ino, dev, nlink, uid, gid,
-             size, atime, epsmtime, ctime) = os.stat(eps)
-            print('\n last mod dates?\n\tSVG: %s\n\tEPS: %s\n'
-                  % (time.ctime(svgmtime), time.ctime(epsmtime)))
-            # compare last modification dates
-            if (svgmtime < epsmtime):
-                flag = 1
-        else:
-            # it does not exist, last modification check omitted,
-            # first export performed
-            print('EPS file not found. New one to be created...')
-    # export SVG-> PDF | EPS, if SVG newer
-    if flag != 0:
+        raise ValueError(out_type)
+    if not os.access(svg, os.F_OK):
+        raise FileNotFoundError(
+            'No SVG file "{f}"'.format(f=svg))
+    t_svg = os.stat(svg)[8]
+    if os.access(out, os.F_OK):
+        print('Output "{f}" file exists.'.format(f=out))
+        t_out = os.stat(out)[8]
+        print((
+            'last modification dates:\n'
+            '    SVG: {t_svg}\n'
+            '    OUTPUT: {t_out}').format(
+                t_svg=t_svg, t_out=t_out))
+    else:
+        t_out = -1
+    if t_svg < t_out:
         print('No update needed, PDF or EPS newer than SVG.')
         return
-    print('Exporting from SVG...\n')
-    assert out_type in ('latex-pdf', 'pdf', 'latex-eps', 'eps'), (
-        'No output option passed.'
-        'Available options: latex-pdf, latex-eps, pdf, eps')
+    print('File not found or old. Converting from SVG...')
     # inkscape need be called with an absolute path on OS X
     # http://wiki.inkscape.org/wiki/index.php/MacOS_X
     symlink_relpath = 'bin/inkscape'
@@ -94,9 +61,9 @@ def export_from_svg(svg, out_type):
     args = ['{inkscape_abspath} -z -D --file={svg}'.format(
         inkscape_abspath=inkscape_abspath, svg=svg)]
     if 'pdf' in out_type:
-        args.append('--export-pdf={pdf}'.format(pdf=pdf))
+        args.append('--export-pdf={pdf}'.format(pdf=out))
     if 'eps' in out_type:
-        args.append('--export-eps={eps}'.format(eps=eps))
+        args.append('--export-eps={eps}'.format(eps=out))
     if 'latex' in out_type:
         args.append('--export-latex')
     args = shlex.split(' '.join(args))
