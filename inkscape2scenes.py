@@ -16,27 +16,15 @@ background, layer2, layer3
 +layer4
 background, layer2 * 0.5, layer3 * 0.5, layer5
 ```
-
-
-License
-=======
-
-Copyright (GPLv3) 2010-2016 by Ioannis Filippidis
-
-Based on:  InkscapeSlide 1.0 by Alexandre Bourget
-GPLv3 Copyright (c) 2008 by Alexandre Bourget
-    http://pypi.python.org/pypi/InkscapeSlide/1.0
-    http://projects.abourget.net/inkscapeslide/
-    https://github.com/abourget/inkscapeslide
-
-
-Note
-====
-
-Changes by Ioannis Filippidis:
-ported to Python 3.2, handling UTF-8,
-latex export, solved encoding="UTF-8" error
 """
+# Based on:  InkscapeSlide 1.0 by Alexandre Bourget
+# Copyright 2010-2017 by Ioannis Filippidis
+# Copyright 2008 by Alexandre Bourget
+#     http://pypi.python.org/pypi/InkscapeSlide/1.0
+#     http://projects.abourget.net/inkscapeslide/
+#     https://github.com/abourget/inkscapeslide
+# All rights reserved. Licensed under GPLv3.
+#
 import lxml.etree
 import sys
 import os
