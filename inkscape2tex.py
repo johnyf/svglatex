@@ -89,6 +89,11 @@ def export_from_svg(svg, out_type):
         print('No update needed, PDF or EPS newer than SVG.')
         return
     print('File not found or old. Converting from SVG...')
+    convert_svg(svg, out, out_type)
+
+
+def convert_svg(svg, out, out_type):
+    """Convert from SVG to output format."""
     # inkscape need be called with an absolute path on OS X
     # http://wiki.inkscape.org/wiki/index.php/MacOS_X
     symlink_relpath = 'bin/inkscape'
