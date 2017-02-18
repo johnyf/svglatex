@@ -52,12 +52,11 @@ Notes
      ii. you want to extract to pdf (and not eps)
 
 
-License
-=======
-
-Copyright (BSD-2) 2010-2016 by Ioannis Filippidis
 """
 import sys
+# Copyright 2010-2017 by Ioannis Filippidis
+# All rights reserved. Licensed under BSD-2.
+#
 import shlex
 import os
 import time
