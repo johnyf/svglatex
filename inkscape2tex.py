@@ -18,6 +18,9 @@ import subprocess
 import fnmatch
 
 
+from svglatex import convert
+
+
 def main():
     """Start from here."""
     args = parse_args()
@@ -93,6 +96,13 @@ def convert_if_svg_newer(svg, out_type):
 
 
 def convert_svg(svg, out, out_type):
+    """Convert from SVG to output format."""
+    # TODO: implement options `latex-eps` and `pdf`, `eps`
+    assert out_type == 'latex-pdf', out_type
+    convert.main(svg)
+
+
+def convert_svg_using_inkscape(svg, out, out_type):
     """Convert from SVG to output format."""
     # inkscape need be called with an absolute path on OS X
     # http://wiki.inkscape.org/wiki/index.php/MacOS_X
