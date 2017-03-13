@@ -78,6 +78,9 @@ def convert_if_svg_newer(svg, out_type):
         raise FileNotFoundError(
             'No SVG file "{f}"'.format(f=svg))
     fresh = compare_file_mod_times(svg, out)
+    if out_type == 'latex-pdf':
+        pdf_tex = svg.replace('.svg', '.pdf_tex')
+        fresh &= compare_file_mod_times(svg, pdf_tex)
     if fresh:
         print('No update needed, target newer than SVG.')
         return
