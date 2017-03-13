@@ -77,6 +77,16 @@ def convert_if_svg_newer(svg, out_type):
     if not os.access(svg, os.F_OK):
         raise FileNotFoundError(
             'No SVG file "{f}"'.format(f=svg))
+    fresh = compare_file_mod_times(svg, out)
+    if fresh:
+        print('No update needed, target newer than SVG.')
+        return
+    print('File not found or old. Converting from SVG...')
+    convert_svg(svg, out, out_type)
+
+
+def compare_file_mod_times(svg, out):
+    """Return `True` target newer than SVG source."""
     t_svg = os.stat(svg)[8]
     if os.access(out, os.F_OK):
         print('Output "{f}" file exists.'.format(f=out))
@@ -88,11 +98,7 @@ def convert_if_svg_newer(svg, out_type):
                 t_svg=t_svg, t_out=t_out))
     else:
         t_out = -1
-    if t_svg < t_out:
-        print('No update needed, PDF or EPS newer than SVG.')
-        return
-    print('File not found or old. Converting from SVG...')
-    convert_svg(svg, out, out_type)
+    return t_svg < t_out
 
 
 def convert_svg(svg, out, out_type):
