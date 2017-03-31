@@ -18,7 +18,8 @@ import subprocess
 import fnmatch
 
 
-from svglatex import convert
+import svg2latex as convert
+# from svglatex import convert
 
 
 def main():
