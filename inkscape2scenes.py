@@ -5,9 +5,8 @@
 Usage
 =====
 
-Create a "content" labeled layer and
-put a text box (no `flowRect`),
-with each line looking like:
+Create a "content" labeled layer and a text box within that layer,
+with lines of the following form:
 
 ```
 background, layer1
@@ -16,6 +15,10 @@ background, layer2, layer3
 +layer4
 background, layer2 * 0.5, layer3 * 0.5, layer5
 ```
+
+Do not use flowed text (no `flowRect`). To do so, select the "A" tool,
+then click (not drag), and type text. If you drag the pointer, then the
+resulting text box will be of flowed text.
 """
 # Based on:  InkscapeSlide 1.0 by Alexandre Bourget
 # Copyright 2010-2017 by Ioannis Filippidis
@@ -102,8 +105,8 @@ def main():
     if not content_layer:
         print(
             "No 'content'-labeled layer."
-            "Create a 'content'-labeled layer and "
-            "put a text box (no flowRect), with each line looking like:")
+            "Create a 'content'-labeled layer, select the 'A' tool, then "
+            "click (not drag), and type lines of the following form:")
         s = [
             "",
             " background, layer1",
@@ -127,8 +130,10 @@ def main():
     s = '{http://www.w3.org/2000/svg}text/{http://www.w3.org/2000/svg}tspan'
     preslides = [x.text for x in content.findall(s) if x.text]
     if not bool(preslides):
-        print("Make sure you have a text box (with no flowRect) in the "
-              "'content' layer, and rerun this program.")
+        print(
+            "Make sure you have a text box without flowed text "
+            "in the 'content' layer, and rerun this program. "
+            "To create one, select the 'A' tool, then click (not drag).")
         sys.exit(1)
     # print(preslides)
     # Get the initial style attribute and keep it
