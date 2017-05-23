@@ -615,7 +615,7 @@ def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
 
 
 def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
-    args = ['/usr/bin/inkscape',
+    args = ['inkscape',
             '--without-gui',
             '--export-area-drawing',
             '--export-ignore-filters',
