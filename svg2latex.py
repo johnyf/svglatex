@@ -342,6 +342,12 @@ def parse_svg_transform(attribute):
         sx = args[0]
         sy = args[1] if len(args) > 1 else sx
         xform.scale(sx, sy)
+    elif func == 'rotate':
+        assert len(args) == 1 or len(args) == 3, args
+        if len(args) == 1:
+            args.extend([0, 0])  # cx, cy
+        xform.rotate_degrees(*args)
+        print('WARNING: text rotation (not tested)')
     else:
         raise Exception(
             'unsupported transform attribute ({a})'.format(
