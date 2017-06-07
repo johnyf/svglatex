@@ -122,9 +122,25 @@ def _format_time(t):
 
 def convert_svg(svg, out, out_type):
     """Convert from SVG to output format."""
-    # TODO: implement options `latex-eps` and `pdf`, `eps`
-    assert out_type == 'latex-pdf', out_type
-    convert.main(svg)
+    # TODO: implement options `latex-eps`, `eps`
+    assert out_type in ('latex-pdf', 'pdf'), out_type
+    if out_type == 'latex-pdf':
+        convert.main(svg)
+    elif out_type == 'pdf':
+        inkscape = convert.which_inkscape()
+        svg_path = os.path.realpath(svg)
+        out_path = os.path.realpath(out)
+        args = [
+            inkscape,
+            '--without-gui',
+            '--export-area-drawing',
+            '--export-ignore-filters',
+            '--export-dpi={dpi}'.format(dpi=96),
+            '--export-pdf={out}'.format(out=out_path),
+            svg_path]
+        r = subprocess.call(args)
+        if r != 0:
+            raise Exception('Conversion error')
 
 
 def convert_svg_using_inkscape(svg, out, out_type):
