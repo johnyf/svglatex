@@ -636,6 +636,21 @@ def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
     return bboxes
 
 
+def which_inkscape():
+    """Return absolute path to `inkscape`.
+
+    Assume that `inkscape` is in the `$PATH`.
+    Useful on OS X, where calling `inkscape` from the command line does not
+    work properly, unless an absolute path is used.
+
+    In the future, using another approach for conversion (e.g., a future
+    version of `cairosvg`) will make this function obsolete.
+    """
+    s = shutil.which('inkscape')
+    inkscape_abspath = os.path.realpath(s)
+    return inkscape_abspath
+
+
 def corners(d):
     x = d['x']
     y = d['y']
