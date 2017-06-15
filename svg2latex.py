@@ -478,8 +478,9 @@ def interpret_svg_textext(textEl, labels):
 
 def svg_bounding_boxes(svgfile):
     """Parses the output from inkscape --query-all"""
+    inkscape = which_inkscape()
     cmd = [
-        'inkscape',
+        inkscape,
         '--without-gui',
         '--query-all',
         svgfile]
@@ -615,7 +616,8 @@ def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
 
 
 def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
-    args = ['inkscape',
+    inkscape = which_inkscape()
+    args = [inkscape,
             '--without-gui',
             '--export-area-drawing',
             '--export-ignore-filters',
