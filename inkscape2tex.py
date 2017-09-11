@@ -12,6 +12,7 @@ Requires `inkscape` in path.
 #
 import argparse
 import fnmatch
+import logging
 import os
 import shlex
 import subprocess
@@ -20,6 +21,9 @@ import time
 
 import svg2latex as convert
 # from svglatex import convert
+
+
+log = logging.getLogger(__name__)
 
 
 def main():
@@ -79,10 +83,10 @@ def convert_if_svg_newer(svg, out_type):
     if not os.access(svg, os.F_OK):
         raise FileNotFoundError(
             'No SVG file "{f}"'.format(f=svg))
-    fresh = compare_file_mod_times(svg, out)
+    fresh = is_newer(out, svg)
     if out_type == 'latex-pdf':
         pdf_tex = base + '.pdf_tex'
-        fresh &= compare_file_mod_times(svg, pdf_tex)
+        fresh &= is_newer(pdf_tex, svg)
     if fresh:
         print('No update needed, target newer than SVG.')
         return
@@ -90,20 +94,20 @@ def convert_if_svg_newer(svg, out_type):
     convert_svg(svg, out, out_type)
 
 
-def compare_file_mod_times(svg, out):
-    """Return `True` target newer than SVG source."""
-    t_svg = os.stat(svg)[8]
-    if os.access(out, os.F_OK):
-        print('Output "{f}" file exists.'.format(f=out))
-        t_out = os.stat(out)[8]
-        print((
-            'last modification dates:\n'
-            '    SVG: {t_svg}\n'
-            '    OUTPUT: {t_out}').format(
-                t_svg=t_svg, t_out=t_out))
-    else:
-        t_out = -1
-    return t_svg < t_out
+def is_newer(target, source):
+    """Return `True` if `target` newer than `source` file."""
+    assert os.path.isfile(source), source
+    if not os.path.isfile(target):
+        return False
+    t_src = os.stat(source)[8]
+    t_tgt = os.stat(target)[8]
+    log.info((
+        'last modification dates:\n'
+        '    Source ({source}): {t_src}\n'
+        '    Target ({target}): {t_tgt}').format(
+            source=source, target=target,
+            t_src=t_src, t_tgt=t_tgt))
+    return t_src < t_tgt
 
 
 def convert_svg(svg, out, out_type):
