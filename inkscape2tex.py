@@ -68,7 +68,6 @@ def parse_args():
 
 def convert_if_svg_newer(svg, out_type):
     """Convert SVG file to PDF or EPS."""
-    svg = svg.replace('\\', '/')
     if 'pdf' in out_type:
         out = svg.replace('.svg', '.pdf')
     elif 'eps' in out_type:
