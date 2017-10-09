@@ -11,6 +11,7 @@ Requires `inkscape` in path.
 # All rights reserved. Licensed under BSD-2.
 #
 import argparse
+import datetime
 import fnmatch
 import logging
 import os
@@ -18,6 +19,7 @@ import shlex
 import subprocess
 import time
 
+import humanize
 
 import svg2latex as convert
 # from svglatex import convert
@@ -101,6 +103,8 @@ def is_newer(target, source):
         return False
     t_src = os.stat(source)[8]
     t_tgt = os.stat(target)[8]
+    t_src = _format_time(t_src)
+    t_tgt = _format_time(t_tgt)
     log.info((
         'last modification dates:\n'
         '    Source ({source}): {t_src}\n'
@@ -108,6 +112,12 @@ def is_newer(target, source):
             source=source, target=target,
             t_src=t_src, t_tgt=t_tgt))
     return t_src < t_tgt
+
+
+def _format_time(t):
+    """Return time readable by humans."""
+    return humanize.naturaltime(
+        datetime.datetime.fromtimestamp(t))
 
 
 def convert_svg(svg, out, out_type):
