@@ -11,11 +11,11 @@ Requires `inkscape` in path.
 # All rights reserved. Licensed under BSD-2.
 #
 import argparse
-import shlex
-import os
-import time
-import subprocess
 import fnmatch
+import os
+import shlex
+import subprocess
+import time
 
 
 import svg2latex as convert
