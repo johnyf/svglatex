@@ -39,7 +39,7 @@ def main():
         files = locate(f, './img')
     svg = None
     for svg in files:
-        print('Will convert SVG file "{f}" to {t}'.format(
+        log.info('Will convert SVG file "{f}" to {t}'.format(
             f=svg, t=out_type))
         convert_if_svg_newer(svg, out_type)
     if svg is None:
@@ -90,9 +90,9 @@ def convert_if_svg_newer(svg, out_type):
         pdf_tex = base + '.pdf_tex'
         fresh &= is_newer(pdf_tex, svg)
     if fresh:
-        print('No update needed, target newer than SVG.')
+        log.info('No update needed, target newer than SVG.')
         return
-    print('File not found or old. Converting from SVG...')
+    log.info('File not found or old. Converting from SVG...')
     convert_svg(svg, out, out_type)
 
 
