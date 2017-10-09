@@ -125,8 +125,9 @@ def convert_svg_using_inkscape(svg, out, out_type):
     home = os.path.expanduser('~')
     symlink_abspath = os.path.join(home, symlink_relpath)
     inkscape_abspath = os.path.realpath(symlink_abspath)
+    svg_abspath = os.path.realpath(svg)
     args = ['{inkscape_abspath} -z -D --file={svg}'.format(
-        inkscape_abspath=inkscape_abspath, svg=svg)]
+        inkscape_abspath=inkscape_abspath, svg=svg_abspath)]
     if 'pdf' in out_type:
         args.append('--export-pdf={pdf}'.format(pdf=out))
     if 'eps' in out_type:

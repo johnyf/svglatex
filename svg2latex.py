@@ -478,11 +478,12 @@ def interpret_svg_textext(textEl, labels):
 def svg_bounding_boxes(svgfile):
     """Parses the output from inkscape --query-all"""
     inkscape = which_inkscape()
+    path = os.path.realpath(svgfile)
     cmd = [
         inkscape,
         '--without-gui',
         '--query-all',
-        svgfile]
+        '--file={s}'.format(s=path)]
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
     lines = p.stdout.readlines()
     bboxes = dict()
@@ -616,12 +617,13 @@ def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
 
 def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
     inkscape = which_inkscape()
+    path = os.path.realpath(pdfpath)
     args = [inkscape,
             '--without-gui',
             '--export-area-drawing',
             '--export-ignore-filters',
             '--export-dpi={dpi}'.format(dpi=DPI),
-            '--export-pdf={path}'.format(path=pdfpath)]
+            '--export-pdf={path}'.format(path=path)]
     with tempfile.NamedTemporaryFile(
             suffix='.svg', delete=True) as tmpsvg:
         svgData.write(tmpsvg, encoding='utf-8',
@@ -629,7 +631,8 @@ def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
         tmpsvg.flush()
         bboxes = svg_bounding_boxes(tmpsvg.name)
         # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
-        args.append(tmpsvg.name)
+        tmp_path = os.path.realpath(tmpsvg.name)
+        args.append('--file={s}'.format(s=tmp_path))
         with subprocess.Popen(args) as proc:
             proc.wait()
             if proc.returncode != 0:
