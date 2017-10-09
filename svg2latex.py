@@ -566,7 +566,7 @@ def main(svg_fname):
     xs = set()
     ys = set()
     bboxes = svg_bounding_boxes(svg_fname)
-    pprint.pprint(bboxes)
+    # pprint.pprint(bboxes)
     for name in text_ids:
         d = bboxes.get(name)
         if name in ignore_ids or d is None:
