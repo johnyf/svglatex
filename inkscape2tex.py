@@ -103,15 +103,19 @@ def is_newer(target, source):
         return False
     t_src = os.stat(source)[8]
     t_tgt = os.stat(target)[8]
-    t_src = _format_time(t_src)
-    t_tgt = _format_time(t_tgt)
+    _print_dates(source, target, t_src, t_tgt)
+    return t_src < t_tgt
+
+
+def _print_dates(source, target, t_src, t_tgt):
+    s = _format_time(t_src)
+    t = _format_time(t_tgt)
     log.info((
         'last modification dates:\n'
-        '    Source ({source}): {t_src}\n'
-        '    Target ({target}): {t_tgt}').format(
+        '    Source ({source}): {s}\n'
+        '    Target ({target}): {t}').format(
             source=source, target=target,
-            t_src=t_src, t_tgt=t_tgt))
-    return t_src < t_tgt
+            s=s, t=t))
 
 
 def _format_time(t):
