@@ -12,7 +12,9 @@ the size of text.
 
 Converting text to path is a simple way to achieve this objective in
 a drawing program (for example Inkscape). A good candidate for such
-conversions are credit lines for graphics, for example pictures.
+conversions are [credit lines](
+    https://en.wikipedia.org/wiki/Attribution_(copyright))
+for graphics, for example pictures.
 
 The same SVG file may contain also mathematics and other text that *does*
 need to be typeset by LaTeX. Separating other cases as above lets you
