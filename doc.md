@@ -1,3 +1,6 @@
+The script `inkscape2tex.py` is known to work with:
+
+- `inkscape == 0.92.2`
 
 
 ## Practical hints
