@@ -1,0 +1,26 @@
+git:
+  depth: 3
+
+language: python
+
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+
+addons:
+  apt:
+    packages:
+      - inkscape
+      - texlive
+      - texlive-xetex
+
+install:
+  - pip install --upgrade pip setuptools
+  # svglatex
+  - pip install .
+
+script:
+  - cd tests/
+  - make all
