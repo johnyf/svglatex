@@ -5,7 +5,6 @@ The script `inkscape2tex.py` is known to work with:
 
 ## Practical hints
 
-
 Sometimes we want some text to remain at the size we have drawn it,
 instead of being typeset at the size of other text in LaTeX.
 Using a size qualifier is one possibility, for example `{\small Foo}`.
@@ -22,3 +21,12 @@ for graphics, for example pictures.
 The same SVG file may contain also mathematics and other text that *does*
 need to be typeset by LaTeX. Separating other cases as above lets you
 focus on the text that will benefit from LaTeX.
+
+
+## Design decisions
+
+The reason for using a module to separate SVG text from SVG graphics,
+instead of the LaTeX [export option of Inkscape](
+    https://www.ctan.org/tex-archive/info/svg-inkscape?lang=en),
+is described in [this GitHub comment](
+    https://github.com/johnyf/inkscape/issues/1#issuecomment-290514835).
