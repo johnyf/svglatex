@@ -1,14 +1,90 @@
-These are two Python scripts for using SVG graphics
-created with [Inkscape](https://inkscape.org)
-in a [LaTeX](https://en.wikipedia.org/wiki/LaTeX) document:
+# About
 
-- `inkscape2tex.py` converts SVG files to PDF or EPS,
-  optionally typesetting text with an [export option of Inkscape](https://www.ctan.org/tex-archive/info/svg-inkscape?lang=en).
+A Python package for including [SVG](
+    https://en.wikipedia.org/wiki/Scalable_Vector_Graphics)
+graphics in [LaTeX](https://en.wikipedia.org/wiki/LaTeX) via [Inkscape](
+    https://inkscape.org).
+The package includes a script that converts:
 
-- `inkscape2scenes.py` converts a layered SVG file to
-  multiple images, named by layer, for incremental graphics animation in
-  a [Beamer](https://en.wikipedia.org/wiki/Beamer_%28LaTeX%29) slide.
+- SVG to [PDF](https://en.wikipedia.org/wiki/PDF) and LaTeX text,
+  with the text overlaid in LaTeX over the graphics as PDF.
+  The package first separates text from graphics, and then uses Inkscape to
+  convert the SVG graphics to a PDF. The text is stored in a LaTeX file with
+  extension `.pdf_tex`.
 
-These scripts are invoked by the latex commands defined in
-[`mycommands.sty`](https://github.com/johnyf/latex_packages/blob/master/mycommands.sty),
-part of `latex_packages`.
+- SVG to PDF, with the text included in the PDF. The package uses Inkscape to
+  convert the entire SVG to a PDF.
+
+SVGLaTeX converts the SVG only if the PDF file is older than the SVG source.
+
+
+# Requirements
+
+- [Inkscape](https://en.wikipedia.org/wiki/Inkscape): needs to be installed and
+  the executable `inkscape` in the environment variable
+  [`$PATH`](https://en.wikipedia.org/wiki/PATH_(variable)).
+
+  On Linux you can install `inkscape` using the operating system's package
+  manager, for example `apt install inkscape` on [Debian](
+      https://www.debian.org).
+
+  On macOS you can create a symbolic link to `inkscape` and `inkscape-bin`
+  as follows:
+
+  ```shell
+  ln -s $HOME/Applications/Inkscape.app/Contents/Resources/bin/inkscape $HOME/bin/inkscape
+  ln -s $HOME/Applications/Inkscape.app/Contents/Resources/bin/inkscape-bin $HOME/bin/inkscape-bin
+  ```
+
+  This assumes that the file `Inkscape.app` is installed in the directory
+  `/$HOME/Applications/`. The environment variable `$HOME` is described [here](
+      https://en.wikipedia.org/wiki/Environment_variable#Examples).
+
+
+# Installation
+
+From the [Python Package Index (PyPI)](https://pypi.org) using the
+package installer [`pip`](https://pip.pypa.io):
+
+```shell
+pip install svglatex
+```
+
+The Python package installs a script named `svglatex` as entry point.
+This script can be invoked from the command line, for example:
+
+```shell
+svglatex -h
+```
+
+
+# Usage
+
+For including SVG files in a LaTeX document, install the Python package `svglatex`
+and the LaTeX style [`svglatex.sty`](
+    https://github.com/johnyf/latex_packages/blob/master/svglatex.sty),
+which includes the LaTeX commands `\includesvg` and `\includesvgpdf`.
+The style file `svglatex.sty` can be:
+
+- placed in the directory `$HOME/texmf/tex/latex/local/`, and then invoking
+  `texhash $HOME/texmf` registers the style with LaTeX.
+  You can find the appropriate location with
+  `kpsewhich -var-value=TEXMFHOME`, as discussed [here](
+      http://tex.stackexchange.com/a/1138/8666). Alternatively,
+
+- placed in the LaTeX document directory, or
+
+- the contents of `svglatex.sty` can be copied to the LaTeX document's preamble.
+
+For convenience, the file `svglatex.sty` is in the directory `tests/`.
+Examples of usage are in the test files `tests/*.tex`.
+
+
+# Tests
+
+See the file `tests/README.md`.
+
+
+# License
+
+[BSD-3](http://opensource.org/licenses/BSD-3-Clause), see file `LICENSE`.
