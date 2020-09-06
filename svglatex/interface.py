@@ -57,8 +57,7 @@ def parse_args():
             'Either file name to search for under `./img`, '
             'or path that starts with `./img`.'))
     choices = [
-        'latex-pdf', 'pdf',
-        'latex-eps', 'eps']
+        'latex-pdf', 'pdf']
     parser.add_argument(
         '-m', '--method', type=str, choices=choices,
         help=(
@@ -125,7 +124,6 @@ def _format_time(t):
 
 def convert_svg(svg, out, out_type):
     """Convert from SVG to output format."""
-    # TODO: implement options `latex-eps`, `eps`
     assert out_type in ('latex-pdf', 'pdf'), out_type
     if out_type == 'latex-pdf':
         converter.main(svg)
