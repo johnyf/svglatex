@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include doc.md
+include requirements.txt
+include tests/README.md
+include tests/Makefile
+include tests/svglatex_test.tex
+include tests/svglatex_integration_test.tex
+include tests/img/beautiful.svg
