@@ -21,8 +21,7 @@ import time
 
 import humanize
 
-import svg2latex as convert
-# from svglatex import convert
+from svglatex import converter
 
 
 log = logging.getLogger(__name__)
@@ -129,9 +128,9 @@ def convert_svg(svg, out, out_type):
     # TODO: implement options `latex-eps`, `eps`
     assert out_type in ('latex-pdf', 'pdf'), out_type
     if out_type == 'latex-pdf':
-        convert.main(svg)
+        converter.main(svg)
     elif out_type == 'pdf':
-        inkscape = convert.which_inkscape()
+        inkscape = converter.which_inkscape()
         svg_path = os.path.realpath(svg)
         out_path = os.path.realpath(out)
         args = [
