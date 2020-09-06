@@ -1,7 +1,14 @@
+svglatex/_version.py
+__pycache__
 *.pyc
+*.whl
 *.swp
 *.pdf
 *.pdf_tex
 *.log
 *.aux
 *.out
+*.tar.gz
+dist/*
+build/*
+*.egg-info
