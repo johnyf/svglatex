@@ -1,0 +1,107 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{svglatex}%
+\RequirePackage{xkeyval}
+% Include SVG graphics in LaTeX via Inkscape.
+%
+% This package defines two LaTeX commands `\includesvg' and `\includesvgpdf'.
+%
+% The command `\includesvg` imports an SVG file by separating its text from
+% graphics, converting the graphics to a PDF and overlaying the text on the
+% PDF using LaTeX. Inkscape is used for the conversion to PDF.
+%
+% The command `\includesvgpdf' imports an SVG file by converting it to PDF,
+% including the text. Inkscape is used for the conversion to PDF.
+%
+% These commands require:
+% - invoking LaTeX with the option `--shell-escape'.
+% - Inkscape: https://inkscape.org
+% - the Python package SVGLaTeX: https://github.com/johnyf/svglatex
+%
+%
+% Copyright 2009-2020 by Ioannis Filippidis
+% All rights reserved. Licensed under BSD-2.
+%
+% Author's email: jfilippidis@gmail.com
+%
+\usepackage{graphicx}  % \includegraphics
+\usepackage{mdframed}  % \begin{mdframed}
+\usepackage{xcolor}  % \color
+\usepackage{xifthen}  % \ifthenelse
+\usepackage{url}  % \urlstyle
+
+
+\DeclareOptionX{demo}[]{\def\mycmd@demo{1}}
+\ProcessOptionsX\relax
+
+\DeclareUrlCommand\EscapeUnderscore{\urlstyle{rm}}
+
+
+%-------------------------------------------
+% SINGLE SVG to PDF + LaTeX
+%-------------------------------------------
+% \includesvg[width=0.5\textwidth]{relative_path}
+% \includesvg[width=0.5\textwidth,tex]{relative_path}
+% \includesvg[width=0.5\textwidth,tex=true]{relative_path}
+%
+%	or
+%
+% \includesvg[width=0.5\textwidth,tex=false]{filename}
+%
+% width = 0.9\textwidth (for example)
+% relative_path = relative path to SVG file, without its extension
+%
+% export for LaTeX .svg to .pdf and include .pdf_tex which inputs the produced .pdf
+\makeatletter
+\define@boolkey{svg}{tex}[true]{}%
+\define@key{svg}{width}{%
+    \def\svgwidth{#1}
+}
+\savekeys{svg}{width}
+\presetkeys{svg}{%
+    width=\textwidth,
+    tex=true
+}{}
+
+\newcommand\includesvg[2][]{%
+    \ifx\mycmd@demo\undefined%
+        \setkeys{svg}{#1}{
+            \ifKV@svg@tex%
+                \immediate\write18{svglatex -i #2 -m latex-pdf}%
+                \ifthenelse{\isempty{\svgwidth}}{%
+                    \global\let\svgwidth\undefined%
+                }{%
+                    %
+                }%
+                \IfFileExists{#2.pdf_tex}{%
+                    \input{#2.pdf_tex}%
+                }{%
+                    \begin{mdframed}[backgroundcolor=black!10]%
+                    {\color{red} FILE \EscapeUnderscore{#2.pdf_tex} NOT FOUND.}%
+                    \end{mdframed}%
+                }%
+            \else%
+                \immediate\write18{svglatex -i #2 -m pdf}%
+                \ifx#1\undefined%
+                    \includegraphics{#2.pdf}%
+                \else%
+                    \includegraphics[width=\svgwidth]{#2.pdf}%
+                \fi%
+            \fi%
+        }%
+    \else%
+        demo mode of includesvg
+    \fi%
+}%
+\makeatother
+
+%-------------------------------------------
+% Wrapper for SVG w/o latex
+%-------------------------------------------
+% \includesvgpdf[width=0.9\textwidth]{filename}
+%
+% filename = SVG file name without any extension
+%
+% export .svg to .pdf and include the produced .pdf
+\newcommand{\includesvgpdf}[2][\undefined]{%
+    \includesvg[#1,tex=false]{#2}%
+}%

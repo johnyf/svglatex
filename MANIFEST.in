@@ -7,3 +7,4 @@ include tests/Makefile
 include tests/svglatex_test.tex
 include tests/svglatex_integration_test.tex
 include tests/img/beautiful.svg
+include tests/svglatex.sty
