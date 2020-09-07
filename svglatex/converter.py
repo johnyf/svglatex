@@ -142,9 +142,6 @@ def main(svg_fname):
         x, _, y, _ = corners(d)
         xs.add(x)
         ys.add(y)
-        if name not in text_ids:
-            xs.add(x + w)
-            ys.add(y + h)
     # Drawing area coordinates within SVG
     for k, d in pdf_bboxes.items():
         if k.startswith('svg'):
