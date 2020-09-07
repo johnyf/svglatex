@@ -476,7 +476,7 @@ def interpret_svg_textext(textEl, labels):
 
 
 def svg_bounding_boxes(svgfile):
-    """Parses the output from inkscape --query-all"""
+    """Parses the output from inkscape `--query-all`."""
     inkscape = which_inkscape()
     path = os.path.realpath(svgfile)
     cmd = [
