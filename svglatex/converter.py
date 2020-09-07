@@ -116,7 +116,358 @@ INKSVG_NAMESPACES = {
 RX_TRANSFORM = re.compile('^\s*(\w+)\(([0-9,\s\.-]*)\)\s*$')
 
 
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument('fname', type=str, help='svg file name')
+    args = p.parse_args()
+    return args
 BBox = collections.namedtuple('BBox', ['x', 'y', 'width', 'height'])
+
+
+def main(svg_fname):
+    fname = os.path.splitext(svg_fname)[0]
+    texpath = '{fname}.pdf_tex'.format(fname=fname)
+    pdfpath = '{fname}.pdf'.format(fname=fname)
+    # convert
+    xml, text_ids, ignore_ids, labels = process_svg(svg_fname)
+    pdf_bboxes = generate_pdf_from_svg_using_inkscape(xml, pdfpath)
+    # get bounding boxes
+    xs = set()
+    ys = set()
+    bboxes = svg_bounding_boxes(svg_fname)
+    # pprint.pprint(bboxes)
+    for name in text_ids:
+        d = bboxes.get(name)
+        if name in ignore_ids or d is None:
+            continue
+        x, _, y, _ = corners(d)
+        xs.add(x)
+        ys.add(y)
+        if name not in text_ids:
+            xs.add(x + w)
+            ys.add(y + h)
+    # Drawing area coordinates within SVG
+    for k, d in pdf_bboxes.items():
+        if k.startswith('svg'):
+            break
+    xmin, xmax, ymin, ymax = corners(d)
+    pdf_bbox = BBox(
+        x=xmin,
+        y=ymin,
+        width=xmax - xmin,
+        height=ymax - ymin)
+    # overall bounding box
+    xs.add(xmin)
+    xs.add(xmax)
+    ys.add(ymin)
+    ys.add(ymax)
+    x_min = min(xs)
+    x_max = max(xs)
+    y_min = min(ys)
+    y_max = max(ys)
+    svg_bbox = BBox(
+        x=x_min,
+        y=y_min,
+        width=x_max - x_min,
+        height=y_max - y_min)
+    tex = TeXPicture(svg_bbox, pdf_bbox)
+    tex.labels = labels
+    tex.backgroundGraphic = pdfpath
+    with open(texpath, 'w', encoding='utf-8') as f:
+        tex.emit_picture(f, xmax - xmin)
+
+
+def process_svg(inpath):
+    doc = etree.parse(inpath)
+    w = mm_to_svg_units(doc.getroot().attrib['width'])
+    h = mm_to_svg_units(doc.getroot().attrib['height'])
+    print('width = {w:0.2f} px, height = {h:0.2f} px'.format(
+        w=w, h=h))
+    w_inch = w / DPI
+    h_inch = h / DPI
+    print('width = {w:0.2f} in, height = {h:0.2f} in'.format(
+        w=w_inch, h=h_inch))
+    w_bp = w * SVG_UNITS_TO_BIG_POINTS
+    h_bp = h * SVG_UNITS_TO_BIG_POINTS
+    print('width = {w:0.2f} bp, height = {h:0.2f} bp'.format(
+        w=w_bp, h=h_bp))
+    text = doc.xpath(
+        '//svg:text', namespaces=INKSVG_NAMESPACES)
+    textext = doc.xpath(
+        '//*[@textext:text]', namespaces=INKSVG_NAMESPACES)
+    ignore_ids = set()
+    for defs in doc.xpath(
+            '//svg:defs', namespaces=INKSVG_NAMESPACES):
+        for u in defs.xpath(
+                '//svg:path', namespaces=INKSVG_NAMESPACES):
+            name = u.attrib['id']
+            ignore_ids.add(name)
+    # extract text and remove it from svg
+    text_ids = set()
+    labels = list()
+    for u in text:
+        ids = interpret_svg_text(u, labels)
+        text_ids.update(ids)
+        parent = u.getparent()
+        parent.remove(u)
+    for u in textext:
+        interpret_svg_textext(u, labels)
+        parent = u.getparent()
+        parent.remove(u)
+    return doc, text_ids, ignore_ids, labels
+
+
+def mm_to_svg_units(x):
+    if 'mm' in x:
+        s = x[:-2]
+        return float(s) / 25.4 * DPI
+    else:
+        return float(x)
+
+
+def interpret_svg_text(textEl, labels):
+    style = split_svg_style(
+        textEl.attrib['style']) if 'style' in textEl.attrib else dict()
+    text_ids = set()
+    name = textEl.attrib['id']
+    text_ids.add(name)
+    all_text = list()
+    xys = list()
+    for tspan in textEl.xpath(
+        'svg:tspan', namespaces=INKSVG_NAMESPACES):
+        span_style = style.copy()
+        if 'style' in tspan.attrib:
+            span_style.update(split_svg_style(tspan.attrib['style']))
+        xform = compute_svg_transform(tspan)
+        pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
+        pos = xform.applyTo(pos)
+        xys.append(pos)
+        # name = tspan.attrib['id']
+        # text_ids.add(name)
+        angle = -round(xform.get_rotation(), 3)
+        all_text.append(tspan.text)
+        texLabel = TeXLabel(pos, '')
+        texLabel.angle = angle
+        if 'fill' in span_style:
+            texLabel.color = parse_svg_color(span_style['fill'])
+        if 'font-weight' in span_style:
+            weight = span_style['font-weight']
+            if weight == 'bold':
+                texLabel.fontweight = WEIGHT_BOLD
+            elif weight == 'normal':
+                texLabel.fontweight = WEIGHT_NORMAL
+            else:
+                texLabel.fontweight = int(weight)
+        if 'font-style' in span_style:
+            fstyle = span_style['font-style']
+            if fstyle == 'normal':
+                texLabel.fontstyle = STYLE_NORMAL
+            elif fstyle == 'italic':
+                texLabel.fontstyle = STYLE_ITALIC
+            elif fstyle == 'oblique':
+                texLabel.fontstyle = STYLE_OBLIQUE
+        if 'text-anchor' in span_style:
+            anchor = span_style['text-anchor']
+            if anchor == 'start':
+                texLabel.align = ALIGN_LEFT
+            elif anchor == 'end':
+                texLabel.align = ALIGN_RIGHT
+            elif anchor == 'middle':
+                texLabel.align = ALIGN_CENTER
+        if 'font-family' in span_style:
+            ff = span_style['font-family']
+            if ff in FONT_MAP:
+                texLabel.fontfamily = FONT_MAP[ff]
+            else:
+                print('Could not match font-family', ff)
+        if 'font-size' in span_style:
+            fs = span_style['font-size']
+            if fs in FONT_SIZE_MAP:
+                texLabel.fontsize = FONT_SIZE_MAP[fs]
+            else:
+                print('Could not match font-size', fs)
+    all_text = [s for s in all_text if s is not None]
+    texLabel.text = ' '.join(all_text)
+    texLabel.pos = xys[0]
+    labels.append(texLabel)
+    return text_ids
+
+
+def split_svg_style(style):
+    parts = [x.strip() for x in style.split(';')]
+    parts = [x.partition(':') for x in parts if x != '']
+    st = dict()
+    for p in parts:
+        st[p[0].strip()] = p[2].strip()
+    return st
+
+
+def compute_svg_transform(el):
+    xform = AffineTransform()
+    while el is not None:
+        if 'transform' in el.attrib:
+            t = parse_svg_transform(el.attrib['transform'])
+            xform = t * xform
+        el = el.getparent()
+    return xform
+
+
+def parse_svg_transform(attribute):
+    m = RX_TRANSFORM.match(attribute)
+    if m is None:
+        raise Exception('bad transform (' + attribute + ')')
+    func = m.group(1)
+    args = [float(x.strip()) for x in m.group(2).split(',')]
+    xform = AffineTransform()
+    if func == 'matrix':
+        if len(args) != 6:
+            raise Exception('bad matrix transform')
+        xform.matrix(*args)
+    elif func == 'translate':
+        if len(args) < 1 or len(args) > 2:
+            raise Exception('bad translate transform')
+        tx = args[0]
+        ty = args[1] if len(args) > 1 else 0.0
+        xform.translate(tx, ty)
+    elif func == 'scale':
+        if len(args) < 1 or len(args) > 2:
+            raise Exception('bad scale transform')
+        sx = args[0]
+        sy = args[1] if len(args) > 1 else sx
+        xform.scale(sx, sy)
+    elif func == 'rotate':
+        assert len(args) == 1 or len(args) == 3, args
+        if len(args) == 1:
+            args.extend([0, 0])  # cx, cy
+        xform.rotate_degrees(*args)
+        print('WARNING: text rotation (not tested)')
+    else:
+        raise Exception(
+            'unsupported transform attribute ({a})'.format(
+                a=attribute))
+    return xform
+
+
+def parse_svg_color(col):
+    if col[0] == '#':
+        r = int(col[1:3], 16)
+        g = int(col[3:5], 16)
+        b = int(col[5:7], 16)
+        return (r, g, b)
+    else:
+        raise Exception('only hash-code colors are supported!')
+
+
+def interpret_svg_textext(textEl, labels):
+    texcode = textEl.attrib[TEXTEXT_PREFIX + 'text'].encode(
+        'utf-8').decode('unicode_escape')
+    xform = compute_svg_transform(textEl)
+    placedElements = textEl.xpath(
+        r'.//svg:use', namespaces=INKSVG_NAMESPACES)
+    if len(placedElements):
+        minX = 1e20
+        maxY = -1e20
+        for el in placedElements:
+            elPos = (float(el.attrib['x']), float(el.attrib['y']))
+            elPos = xform.applyTo(elPos)
+            x, y = elPos
+            if x < minX:
+                minX = x
+            if y > maxY:
+                maxY = y
+        pos = (minX, maxY)
+    else:
+        pos = (0.0, 0.0)
+    labels.append(RawTeXLabel(pos, texcode))
+
+
+def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
+    inkscape = which_inkscape()
+    path = os.path.realpath(pdfpath)
+    args = [inkscape,
+            '--without-gui',
+            '--export-area-drawing',
+            '--export-ignore-filters',
+            '--export-dpi={dpi}'.format(dpi=DPI),
+            '--export-pdf={path}'.format(path=path)]
+    with tempfile.NamedTemporaryFile(
+            suffix='.svg', delete=True) as tmpsvg:
+        svgData.write(tmpsvg, encoding='utf-8',
+                      xml_declaration=True)
+        tmpsvg.flush()
+        bboxes = svg_bounding_boxes(tmpsvg.name)
+        # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
+        tmp_path = os.path.realpath(tmpsvg.name)
+        args.append('--file={s}'.format(s=tmp_path))
+        with subprocess.Popen(args) as proc:
+            proc.wait()
+            if proc.returncode != 0:
+                sys.stderr.write('inkscape svg->pdf failed')
+    return bboxes
+
+
+def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
+    with tempfile.NamedTemporaryFile(
+            suffix='.svg', delete=True) as tmpsvg:
+        svgData.write(tmpsvg, encoding='utf-8',
+                      xml_declaration=True)
+        tmpsvg.flush()
+        bboxes = svg_bounding_boxes(tmpsvg.name)
+        # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
+        cairosvg.svg2pdf(
+            file_obj=tmpsvg,
+            write_to=pdfpath)
+    return bboxes
+
+
+def svg_bounding_boxes(svgfile):
+    """Parses the output from inkscape `--query-all`."""
+    inkscape = which_inkscape()
+    path = os.path.realpath(svgfile)
+    cmd = [
+        inkscape,
+        '--without-gui',
+        '--query-all',
+        '--file={s}'.format(s=path)]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    lines = p.stdout.readlines()
+    bboxes = dict()
+    for line in lines:
+        name, x, y, w, h = parse_line(line)
+        bboxes[name] = dict(x=x, y=y, w=w, h=h)
+    return bboxes
+
+
+def which_inkscape():
+    """Return absolute path to `inkscape`.
+
+    Assume that `inkscape` is in the `$PATH`.
+    Useful on OS X, where calling `inkscape` from the command line does not
+    work properly, unless an absolute path is used.
+
+    In the future, using another approach for conversion (e.g., a future
+    version of `cairosvg`) will make this function obsolete.
+    """
+    s = shutil.which('inkscape')
+    inkscape_abspath = os.path.realpath(s)
+    return inkscape_abspath
+
+
+def parse_line(line):
+    split = line.split(',')
+    name = split[0]
+    x, y, w, h = [float(x) for x in split[1:]]
+    return name, x, y, w, h
+
+
+def corners(d):
+    x = d['x']
+    y = d['y']
+    w = d['w']
+    h = d['h']
+    xmax = x + w
+    ymax = y + h
+    return x, xmax, y, ymax
 
 
 class AffineTransform(object):
@@ -321,359 +672,6 @@ class TeXPicture(object):
 
 def _round(*args, unit=1):
     return tuple(round(x / unit, 3) for x in args)
-
-
-def parse_svg_transform(attribute):
-    m = RX_TRANSFORM.match(attribute)
-    if m is None:
-        raise Exception('bad transform (' + attribute + ')')
-    func = m.group(1)
-    args = [float(x.strip()) for x in m.group(2).split(',')]
-    xform = AffineTransform()
-    if func == 'matrix':
-        if len(args) != 6:
-            raise Exception('bad matrix transform')
-        xform.matrix(*args)
-    elif func == 'translate':
-        if len(args) < 1 or len(args) > 2:
-            raise Exception('bad translate transform')
-        tx = args[0]
-        ty = args[1] if len(args) > 1 else 0.0
-        xform.translate(tx, ty)
-    elif func == 'scale':
-        if len(args) < 1 or len(args) > 2:
-            raise Exception('bad scale transform')
-        sx = args[0]
-        sy = args[1] if len(args) > 1 else sx
-        xform.scale(sx, sy)
-    elif func == 'rotate':
-        assert len(args) == 1 or len(args) == 3, args
-        if len(args) == 1:
-            args.extend([0, 0])  # cx, cy
-        xform.rotate_degrees(*args)
-        print('WARNING: text rotation (not tested)')
-    else:
-        raise Exception(
-            'unsupported transform attribute ({a})'.format(
-                a=attribute))
-    return xform
-
-
-def split_svg_style(style):
-    parts = [x.strip() for x in style.split(';')]
-    parts = [x.partition(':') for x in parts if x != '']
-    st = dict()
-    for p in parts:
-        st[p[0].strip()] = p[2].strip()
-    return st
-
-
-def parse_svg_color(col):
-    if col[0] == '#':
-        r = int(col[1:3], 16)
-        g = int(col[3:5], 16)
-        b = int(col[5:7], 16)
-        return (r, g, b)
-    else:
-        raise Exception('only hash-code colors are supported!')
-
-
-def compute_svg_transform(el):
-    xform = AffineTransform()
-    while el is not None:
-        if 'transform' in el.attrib:
-            t = parse_svg_transform(el.attrib['transform'])
-            xform = t * xform
-        el = el.getparent()
-    return xform
-
-
-def interpret_svg_text(textEl, labels):
-    style = split_svg_style(
-        textEl.attrib['style']) if 'style' in textEl.attrib else dict()
-    text_ids = set()
-    name = textEl.attrib['id']
-    text_ids.add(name)
-    all_text = list()
-    xys = list()
-    for tspan in textEl.xpath(
-        'svg:tspan', namespaces=INKSVG_NAMESPACES):
-        span_style = style.copy()
-        if 'style' in tspan.attrib:
-            span_style.update(split_svg_style(tspan.attrib['style']))
-        xform = compute_svg_transform(tspan)
-        pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
-        pos = xform.applyTo(pos)
-        xys.append(pos)
-        # name = tspan.attrib['id']
-        # text_ids.add(name)
-        angle = -round(xform.get_rotation(), 3)
-        all_text.append(tspan.text)
-        texLabel = TeXLabel(pos, '')
-        texLabel.angle = angle
-        if 'fill' in span_style:
-            texLabel.color = parse_svg_color(span_style['fill'])
-        if 'font-weight' in span_style:
-            weight = span_style['font-weight']
-            if weight == 'bold':
-                texLabel.fontweight = WEIGHT_BOLD
-            elif weight == 'normal':
-                texLabel.fontweight = WEIGHT_NORMAL
-            else:
-                texLabel.fontweight = int(weight)
-        if 'font-style' in span_style:
-            fstyle = span_style['font-style']
-            if fstyle == 'normal':
-                texLabel.fontstyle = STYLE_NORMAL
-            elif fstyle == 'italic':
-                texLabel.fontstyle = STYLE_ITALIC
-            elif fstyle == 'oblique':
-                texLabel.fontstyle = STYLE_OBLIQUE
-        if 'text-anchor' in span_style:
-            anchor = span_style['text-anchor']
-            if anchor == 'start':
-                texLabel.align = ALIGN_LEFT
-            elif anchor == 'end':
-                texLabel.align = ALIGN_RIGHT
-            elif anchor == 'middle':
-                texLabel.align = ALIGN_CENTER
-        if 'font-family' in span_style:
-            ff = span_style['font-family']
-            if ff in FONT_MAP:
-                texLabel.fontfamily = FONT_MAP[ff]
-            else:
-                print('Could not match font-family', ff)
-        if 'font-size' in span_style:
-            fs = span_style['font-size']
-            if fs in FONT_SIZE_MAP:
-                texLabel.fontsize = FONT_SIZE_MAP[fs]
-            else:
-                print('Could not match font-size', fs)
-    all_text = [s for s in all_text if s is not None]
-    texLabel.text = ' '.join(all_text)
-    texLabel.pos = xys[0]
-    labels.append(texLabel)
-    return text_ids
-
-
-def interpret_svg_textext(textEl, labels):
-    texcode = textEl.attrib[TEXTEXT_PREFIX + 'text'].encode(
-        'utf-8').decode('unicode_escape')
-    xform = compute_svg_transform(textEl)
-    placedElements = textEl.xpath(
-        r'.//svg:use', namespaces=INKSVG_NAMESPACES)
-    if len(placedElements):
-        minX = 1e20
-        maxY = -1e20
-        for el in placedElements:
-            elPos = (float(el.attrib['x']), float(el.attrib['y']))
-            elPos = xform.applyTo(elPos)
-            x, y = elPos
-            if x < minX:
-                minX = x
-            if y > maxY:
-                maxY = y
-        pos = (minX, maxY)
-    else:
-        pos = (0.0, 0.0)
-    labels.append(RawTeXLabel(pos, texcode))
-
-
-def svg_bounding_boxes(svgfile):
-    """Parses the output from inkscape `--query-all`."""
-    inkscape = which_inkscape()
-    path = os.path.realpath(svgfile)
-    cmd = [
-        inkscape,
-        '--without-gui',
-        '--query-all',
-        '--file={s}'.format(s=path)]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    lines = p.stdout.readlines()
-    bboxes = dict()
-    for line in lines:
-        name, x, y, w, h = parse_line(line)
-        bboxes[name] = dict(x=x, y=y, w=w, h=h)
-    return bboxes
-
-
-def parse_line(line):
-    split = line.split(',')
-    name = split[0]
-    x, y, w, h = [float(x) for x in split[1:]]
-    return name, x, y, w, h
-
-
-def mm_to_svg_units(x):
-    if 'mm' in x:
-        s = x[:-2]
-        return float(s) / 25.4 * DPI
-    else:
-        return float(x)
-
-
-def process_svg(inpath):
-    doc = etree.parse(inpath)
-    w = mm_to_svg_units(doc.getroot().attrib['width'])
-    h = mm_to_svg_units(doc.getroot().attrib['height'])
-    print('width = {w:0.2f} px, height = {h:0.2f} px'.format(
-        w=w, h=h))
-    w_inch = w / DPI
-    h_inch = h / DPI
-    print('width = {w:0.2f} in, height = {h:0.2f} in'.format(
-        w=w_inch, h=h_inch))
-    w_bp = w * SVG_UNITS_TO_BIG_POINTS
-    h_bp = h * SVG_UNITS_TO_BIG_POINTS
-    print('width = {w:0.2f} bp, height = {h:0.2f} bp'.format(
-        w=w_bp, h=h_bp))
-    text = doc.xpath(
-        '//svg:text', namespaces=INKSVG_NAMESPACES)
-    textext = doc.xpath(
-        '//*[@textext:text]', namespaces=INKSVG_NAMESPACES)
-    ignore_ids = set()
-    for defs in doc.xpath(
-            '//svg:defs', namespaces=INKSVG_NAMESPACES):
-        for u in defs.xpath(
-                '//svg:path', namespaces=INKSVG_NAMESPACES):
-            name = u.attrib['id']
-            ignore_ids.add(name)
-    # extract text and remove it from svg
-    text_ids = set()
-    labels = list()
-    for u in text:
-        ids = interpret_svg_text(u, labels)
-        text_ids.update(ids)
-        parent = u.getparent()
-        parent.remove(u)
-    for u in textext:
-        interpret_svg_textext(u, labels)
-        parent = u.getparent()
-        parent.remove(u)
-    return doc, text_ids, ignore_ids, labels
-
-
-def main(svg_fname):
-    fname = os.path.splitext(svg_fname)[0]
-    texpath = '{fname}.pdf_tex'.format(fname=fname)
-    pdfpath = '{fname}.pdf'.format(fname=fname)
-    # convert
-    xml, text_ids, ignore_ids, labels = process_svg(svg_fname)
-    pdf_bboxes = generate_pdf_from_svg_using_inkscape(xml, pdfpath)
-    # get bounding boxes
-    xs = set()
-    ys = set()
-    bboxes = svg_bounding_boxes(svg_fname)
-    # pprint.pprint(bboxes)
-    for name in text_ids:
-        d = bboxes.get(name)
-        if name in ignore_ids or d is None:
-            continue
-        x, _, y, _ = corners(d)
-        xs.add(x)
-        ys.add(y)
-        if name not in text_ids:
-            xs.add(x + w)
-            ys.add(y + h)
-    # Drawing area coordinates within SVG
-    for k, d in pdf_bboxes.items():
-        if k.startswith('svg'):
-            break
-    xmin, xmax, ymin, ymax = corners(d)
-    pdf_bbox = BBox(
-        x=xmin,
-        y=ymin,
-        width=xmax - xmin,
-        height=ymax - ymin)
-    # overall bounding box
-    xs.add(xmin)
-    xs.add(xmax)
-    ys.add(ymin)
-    ys.add(ymax)
-    x_min = min(xs)
-    x_max = max(xs)
-    y_min = min(ys)
-    y_max = max(ys)
-    svg_bbox = BBox(
-        x=x_min,
-        y=y_min,
-        width=x_max - x_min,
-        height=y_max - y_min)
-    tex = TeXPicture(svg_bbox, pdf_bbox)
-    tex.labels = labels
-    tex.backgroundGraphic = pdfpath
-    with open(texpath, 'w', encoding='utf-8') as f:
-        tex.emit_picture(f, xmax - xmin)
-
-
-def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
-    with tempfile.NamedTemporaryFile(
-            suffix='.svg', delete=True) as tmpsvg:
-        svgData.write(tmpsvg, encoding='utf-8',
-                      xml_declaration=True)
-        tmpsvg.flush()
-        bboxes = svg_bounding_boxes(tmpsvg.name)
-        # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
-        cairosvg.svg2pdf(
-            file_obj=tmpsvg,
-            write_to=pdfpath)
-    return bboxes
-
-
-def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
-    inkscape = which_inkscape()
-    path = os.path.realpath(pdfpath)
-    args = [inkscape,
-            '--without-gui',
-            '--export-area-drawing',
-            '--export-ignore-filters',
-            '--export-dpi={dpi}'.format(dpi=DPI),
-            '--export-pdf={path}'.format(path=path)]
-    with tempfile.NamedTemporaryFile(
-            suffix='.svg', delete=True) as tmpsvg:
-        svgData.write(tmpsvg, encoding='utf-8',
-                      xml_declaration=True)
-        tmpsvg.flush()
-        bboxes = svg_bounding_boxes(tmpsvg.name)
-        # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
-        tmp_path = os.path.realpath(tmpsvg.name)
-        args.append('--file={s}'.format(s=tmp_path))
-        with subprocess.Popen(args) as proc:
-            proc.wait()
-            if proc.returncode != 0:
-                sys.stderr.write('inkscape svg->pdf failed')
-    return bboxes
-
-
-def which_inkscape():
-    """Return absolute path to `inkscape`.
-
-    Assume that `inkscape` is in the `$PATH`.
-    Useful on OS X, where calling `inkscape` from the command line does not
-    work properly, unless an absolute path is used.
-
-    In the future, using another approach for conversion (e.g., a future
-    version of `cairosvg`) will make this function obsolete.
-    """
-    s = shutil.which('inkscape')
-    inkscape_abspath = os.path.realpath(s)
-    return inkscape_abspath
-
-
-def corners(d):
-    x = d['x']
-    y = d['y']
-    w = d['w']
-    h = d['h']
-    xmax = x + w
-    ymax = y + h
-    return x, xmax, y, ymax
-
-
-def parse_args():
-    p = argparse.ArgumentParser()
-    p.add_argument('fname', type=str, help='svg file name')
-    args = p.parse_args()
-    return args
 
 
 if __name__ == '__main__':
