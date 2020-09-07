@@ -361,7 +361,7 @@ def parse_svg_transform(attribute):
 def split_svg_style(style):
     parts = [x.strip() for x in style.split(';')]
     parts = [x.partition(':') for x in parts if x != '']
-    st = {}
+    st = dict()
     for p in parts:
         st[p[0].strip()] = p[2].strip()
     return st
@@ -389,7 +389,7 @@ def compute_svg_transform(el):
 
 def interpret_svg_text(textEl, labels):
     style = split_svg_style(
-        textEl.attrib['style']) if 'style' in textEl.attrib else {}
+        textEl.attrib['style']) if 'style' in textEl.attrib else dict()
     text_ids = set()
     name = textEl.attrib['id']
     text_ids.add(name)
