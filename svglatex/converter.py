@@ -121,37 +121,37 @@ BBox = collections.namedtuple('BBox', ['x', 'y', 'width', 'height'])
 
 class AffineTransform(object):
 
-    def __init__(s, t=None, m=None):
-        s.t = (0.0, 0.0) if t is None else t
-        s.m = (1.0, 0.0, 0.0, 1.0) if m is None else m
+    def __init__(self, t=None, m=None):
+        self.t = (0.0, 0.0) if t is None else t
+        self.m = (1.0, 0.0, 0.0, 1.0) if m is None else m
 
-    def clone(s):
+    def clone(self):
         nt = AffineTransform()
-        nt.t = s.t
-        nt.m = s.m
+        nt.t = self.t
+        nt.m = self.m
         return nt
 
-    def translate(s, tx, ty):
-        s.matrix(1.0, 0.0, 0.0, 1.0, tx, ty)
+    def translate(self, tx, ty):
+        self.matrix(1.0, 0.0, 0.0, 1.0, tx, ty)
 
-    def rotate_degrees(s, angle, cx=0.0, cy=0.0):
+    def rotate_degrees(self, angle, cx=0.0, cy=0.0):
         angle = math.radians(angle)
         sin, cos = math.sin(angle), math.cos(angle)
         if cx != 0.0 or cy != 0.0:
-            s.translate(cx, cy)
-            s.matrix(cos, sin, -sin, cos, 0.0, 0.0)
-            s.translate(-cx, -cy)
+            self.translate(cx, cy)
+            self.matrix(cos, sin, -sin, cos, 0.0, 0.0)
+            self.translate(-cx, -cy)
         else:
-            s.matrix(cos, sin, -sin, cos, 0.0, 0.0)
+            self.matrix(cos, sin, -sin, cos, 0.0, 0.0)
 
-    def scale(s, sx, sy=None):
+    def scale(self, sx, sy=None):
         if sy is None:
             sy = sx
-        s.matrix(sx, 0.0, 0.0, sy)
+        self.matrix(sx, 0.0, 0.0, sy)
 
-    def matrix(s, a, b, c, d, e=0.0, f=0.0):
-        sa, sb, sc, sd = s.m
-        se, sf = s.t
+    def matrix(self, a, b, c, d, e=0.0, f=0.0):
+        sa, sb, sc, sd = self.m
+        se, sf = self.t
 
         ma = sa * a + sc * b
         mb = sb * a + sd * b
@@ -159,19 +159,20 @@ class AffineTransform(object):
         md = sb * c + sd * d
         me = sa * e + sc * f + se
         mf = sb * e + sd * f + sf
-        s.m = (ma, mb, mc, md)
-        s.t = (me, mf)
+        self.m = (ma, mb, mc, md)
+        self.t = (me, mf)
 
-    def applyTo(s, x, y=None):
+    def applyTo(self, x, y=None):
         if y is None:
             x, y = x
-        xx = s.t[0] + s.m[0] * x + s.m[2] * y
-        yy = s.t[1] + s.m[1] * x + s.m[3] * y
+        xx = self.t[0] + self.m[0] * x + self.m[2] * y
+        yy = self.t[1] + self.m[1] * x + self.m[3] * y
         return (xx, yy)
 
-    def __str__(s):
+    def __str__(self):
         return '[{},{},{}  ;  {},{},{}]'.format(
-            s.m[0], s.m[2], s.t[0], s.m[1], s.m[3], s.t[1])
+            self.m[0], self.m[2], self.t[0],
+            self.m[1], self.m[3], self.t[1])
 
     def __mul__(a, b):
         a11, a21, a12, a22 = a.m
@@ -188,8 +189,8 @@ class AffineTransform(object):
         c23 = a21 * b13 + a22 * b23 + a23
         return AffineTransform((c13, c23), (c11, c21, c12, c22))
 
-    def get_rotation(s):
-        m11, m21, m12, m22 = s.m
+    def get_rotation(self):
+        m11, m21, m12, m22 = self.m
         len1 = math.sqrt(m11 * m11 + m21 * m21)
         len2 = math.sqrt(m12 * m12 + m22 * m22)
         # TODO check that len1 and len2 are close to 1
@@ -200,61 +201,61 @@ class AffineTransform(object):
 
 class RawTeXLabel(object):
 
-    def __init__(s, pos, texcode):
-        s.pos = pos
-        s.code = texcode
+    def __init__(self, pos, texcode):
+        self.pos = pos
+        self.code = texcode
 
-    def texcode(s):
+    def texcode(self):
         return (
             '\\scalebox{' + str(SVG_UNITS_TO_BIG_POINTS) +
-            '}{\\makebox(0,0)[bl]{%\n' + s.code + '%\n}}')
+            '}{\\makebox(0,0)[bl]{%\n' + self.code + '%\n}}')
 
 
 class TeXLabel(object):
 
-    def __init__(s, pos, text):
-        s.text = text
-        s.color = (0, 0, 0)
-        s.pos = pos
-        s.angle = 0.0
-        s.align = ALIGN_LEFT
-        s.fontsize = None
-        s.fontfamily = 'rm'
-        s.fontweight = WEIGHT_NORMAL
-        s.fontstyle = STYLE_NORMAL
-        s.scale = 1.0
+    def __init__(self, pos, text):
+        self.text = text
+        self.color = (0, 0, 0)
+        self.pos = pos
+        self.angle = 0.0
+        self.align = ALIGN_LEFT
+        self.fontsize = None
+        self.fontfamily = 'rm'
+        self.fontweight = WEIGHT_NORMAL
+        self.fontstyle = STYLE_NORMAL
+        self.scale = 1.0
 
-    def texcode(s):
+    def texcode(self):
         font, color, align = '', '', ''
 
-        r, g, b = s.color
+        r, g, b = self.color
         if (r != 0) or (g != 0) or (b != 0):
             color = '\\color[RGB]{{{},{},{}}}'.format(r, g, b)
 
-        font = '\\' + s.fontfamily + 'family'
-        if s.fontweight >= WEIGHT_BOLD:
+        font = '\\' + self.fontfamily + 'family'
+        if self.fontweight >= WEIGHT_BOLD:
             font = font + r'\bfseries'
-        if s.fontstyle == STYLE_ITALIC:
+        if self.fontstyle == STYLE_ITALIC:
             font = font + r'\itshape'
-        elif s.fontstyle == STYLE_OBLIQUE:
+        elif self.fontstyle == STYLE_OBLIQUE:
             font = font + r'\slshape'
-        if s.fontsize is not None:
-            font = font + s.fontsize
+        if self.fontsize is not None:
+            font = font + self.fontsize
 
-        if s.align == ALIGN_LEFT:
+        if self.align == ALIGN_LEFT:
             align = r'\makebox(0,0)[bl]'
-        elif s.align == ALIGN_CENTER:
+        elif self.align == ALIGN_CENTER:
             align = r'\makebox(0,0)[b]'
-        elif s.align == ALIGN_RIGHT:
+        elif self.align == ALIGN_RIGHT:
             align = r'\makebox(0,0)[br]'
 
-        if s.text is None:
-            s.text = ''
-        texcode = font + color + align + r'{\smash{' + s.text + '}}'
+        if self.text is None:
+            self.text = ''
+        texcode = font + color + align + r'{\smash{' + self.text + '}}'
 
-        if s.angle != 0.0:
+        if self.angle != 0.0:
             texcode = '\\rotatebox{{{}}}{{{}}}'.format(
-                s.angle, texcode)
+                self.angle, texcode)
 
         return texcode
 
