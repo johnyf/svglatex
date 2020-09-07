@@ -276,6 +276,8 @@ class TeXPicture(object):
         c = list()
         if self.backgroundGraphic is not None:
             x = self.pdf_bbox.x - xmin
+            # the SVG coordinate system origin is at the top left corner
+            # whereas the `picture` origin is at the lower left corner
             y = (h + ymin) - (self.pdf_bbox.height + self.pdf_bbox.y)
             x, y = _round(x, y, unit=unit)
             scale = self.pdf_bbox.width / unit
