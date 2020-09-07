@@ -68,6 +68,7 @@ FONT_SIZE_MAP = {
 
 # 72 big-points (PostScript points) (72 bp) per inch,
 # 96 SVG "User Units" (96 px) per inch
+# https://wiki.inkscape.org/wiki/index.php/Units_In_Inkscape
 DPI = 96
 SVG_UNITS_TO_BIG_POINTS = 72.0 / DPI
 
