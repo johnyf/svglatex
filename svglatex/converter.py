@@ -503,7 +503,7 @@ def parse_line(line):
     return name, x, y, w, h
 
 
-def mm_to_svg_untis(x):
+def mm_to_svg_units(x):
     if 'mm' in x:
         s = x[:-2]
         return float(s) / 25.4 * DPI
@@ -513,8 +513,8 @@ def mm_to_svg_untis(x):
 
 def process_svg(inpath):
     doc = etree.parse(inpath)
-    w = mm_to_svg_untis(doc.getroot().attrib['width'])
-    h = mm_to_svg_untis(doc.getroot().attrib['height'])
+    w = mm_to_svg_units(doc.getroot().attrib['width'])
+    h = mm_to_svg_units(doc.getroot().attrib['height'])
     print('width = {w:0.2f} px, height = {h:0.2f} px'.format(
         w=w, h=h))
     w_inch = w / DPI
