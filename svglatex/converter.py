@@ -318,7 +318,7 @@ def _make_scaling_transform(args):
 def _make_rotation_transform(args):
     assert len(args) in (1, 3), args
     if len(args) == 1:
-        args.extend([0, 0])  # cx, cy
+        args = args + [0, 0]  # cx, cy
     xform = AffineTransform()
     xform.rotate_degrees(*args)
     print('WARNING: text rotation (not tested)')
