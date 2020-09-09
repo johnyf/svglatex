@@ -451,9 +451,8 @@ def which_inkscape():
 
 def parse_bbox_string(line):
     """Return `x, y, w, h` from bounding box string."""
-    split = line.split(',')
-    name = split[0]
-    x, y, w, h = [float(x) for x in split[1:]]
+    name, *rest = line.split(',')
+    x, y, w, h = [float(x) for x in rest]
     return name, x, y, w, h
 
 
