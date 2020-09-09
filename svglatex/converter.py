@@ -589,39 +589,68 @@ class TeXLabel(object):
         self.scale = 1.0
 
     def texcode(self):
-        font, color, align = '', '', ''
+        color = self._color_tex()
+        font = '\\' + self.fontfamily + 'family'
+        font += self._font_weight_tex()
+        font += self._font_style_tex()
+        font += self._font_size_tex()
+        align = self._alignment_tex()
+        text = self._text()
+        texcode = (
+            font + color + align +
+            r'{\smash{' + text + '}}')
+        if self.angle != 0.0:
+            texcode = (
+                '\\rotatebox{{{angle}}}{{{texcode}}}'
+                ).format(
+                    angle=self.angle,
+                    texcode=texcode)
+        return texcode
 
+    def _color_tex(self):
         r, g, b = self.color
         if r != 0 or g != 0 or b != 0:
             color = '\\color[RGB]{{{r},{g},{b}}}'.format(
                 r=r, g=g, b=b)
+        else:
+            color = ''
+        return color
 
-        font = '\\' + self.fontfamily + 'family'
+    def _font_weight_tex(self):
         if self.fontweight >= WEIGHT_BOLD:
-            font = font + r'\bfseries'
+            return r'\bfseries'
+        else:
+            return ''
+
+    def _font_style_tex(self):
         if self.fontstyle == STYLE_ITALIC:
-            font = font + r'\itshape'
+            return r'\itshape'
         elif self.fontstyle == STYLE_OBLIQUE:
-            font = font + r'\slshape'
+            return r'\slshape'
+        else:
+            return ''
+
+    def _font_size_tex(self):
         if self.fontsize is not None:
-            font = font + self.fontsize
+            return self.fontsize
+        else:
+            return ''
 
+    def _alignment_tex(self):
         if self.align == ALIGN_LEFT:
-            align = r'\makebox(0,0)[bl]'
+            return r'\makebox(0,0)[bl]'
         elif self.align == ALIGN_CENTER:
-            align = r'\makebox(0,0)[b]'
+            return r'\makebox(0,0)[b]'
         elif self.align == ALIGN_RIGHT:
-            align = r'\makebox(0,0)[br]'
+            return r'\makebox(0,0)[br]'
+        else:
+            raise ValueError(align)
 
+    def _text(self):
         if self.text is None:
-            self.text = ''
-        texcode = font + color + align + r'{\smash{' + self.text + '}}'
-
-        if self.angle != 0.0:
-            texcode = '\\rotatebox{{{}}}{{{}}}'.format(
-                self.angle, texcode)
-
-        return texcode
+            return ''
+        else:
+            return self.text
 
 
 class TeXPicture(object):
