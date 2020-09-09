@@ -142,18 +142,7 @@ def main(svg_fname):
 
 def process_svg(inpath):
     doc = etree.parse(inpath)
-    w = mm_to_svg_units(doc.getroot().attrib['width'])
-    h = mm_to_svg_units(doc.getroot().attrib['height'])
-    print('width = {w:0.2f} px, height = {h:0.2f} px'.format(
-        w=w, h=h))
-    w_inch = w / DPI
-    h_inch = h / DPI
-    print('width = {w:0.2f} in, height = {h:0.2f} in'.format(
-        w=w_inch, h=h_inch))
-    w_bp = w * SVG_UNITS_TO_BIG_POINTS
-    h_bp = h * SVG_UNITS_TO_BIG_POINTS
-    print('width = {w:0.2f} bp, height = {h:0.2f} bp'.format(
-        w=w_bp, h=h_bp))
+    _print_svg_units(doc)
     text = doc.xpath(
         '//svg:text', namespaces=INKSVG_NAMESPACES)
     textext = doc.xpath(
@@ -178,6 +167,21 @@ def process_svg(inpath):
         parent = u.getparent()
         parent.remove(u)
     return doc, text_ids, ignore_ids, labels
+
+
+def _print_svg_units(doc):
+    w = mm_to_svg_units(doc.getroot().attrib['width'])
+    h = mm_to_svg_units(doc.getroot().attrib['height'])
+    print('width = {w:0.2f} px, height = {h:0.2f} px'.format(
+        w=w, h=h))
+    w_inch = w / DPI
+    h_inch = h / DPI
+    print('width = {w:0.2f} in, height = {h:0.2f} in'.format(
+        w=w_inch, h=h_inch))
+    w_bp = w * SVG_UNITS_TO_BIG_POINTS
+    h_bp = h * SVG_UNITS_TO_BIG_POINTS
+    print('width = {w:0.2f} bp, height = {h:0.2f} bp'.format(
+        w=w_bp, h=h_bp))
 
 
 def mm_to_svg_units(x):
