@@ -184,8 +184,11 @@ def mm_to_svg_units(x):
 
 
 def interpret_svg_text(textEl, labels):
-    style = split_svg_style(
-        textEl.attrib['style']) if 'style' in textEl.attrib else dict()
+    if 'style' in textEl.attrib:
+        style = split_svg_style(
+            textEl.attrib['style'])
+    else:
+        style = dict()
     text_ids = set()
     name = textEl.attrib['id']
     text_ids.add(name)
@@ -195,7 +198,8 @@ def interpret_svg_text(textEl, labels):
             'svg:tspan', namespaces=INKSVG_NAMESPACES):
         span_style = style.copy()
         if 'style' in tspan.attrib:
-            span_style.update(split_svg_style(tspan.attrib['style']))
+            st = split_svg_style(tspan.attrib['style'])
+            span_style.update(st)
         xform = compute_svg_transform(tspan)
         pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
         pos = xform.applyTo(pos)
