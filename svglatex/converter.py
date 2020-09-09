@@ -105,8 +105,7 @@ INKSVG_NAMESPACES = {
     'xlink': r'http://www.w3.org/1999/xlink',
     'sodipodi': (r'http://sodipodi.sourceforge.net/'
                  r'DTD/sodipodi-0.dtd'),
-    'inkscape': r'http://www.inkscape.org/namespaces/inkscape',
-}
+    'inkscape': r'http://www.inkscape.org/namespaces/inkscape'}
 # transform re
 RX_TRANSFORM = re.compile('^\s*(\w+)\(([0-9,\s\.-]*)\)\s*$')
 # bounding box
@@ -193,7 +192,7 @@ def interpret_svg_text(textEl, labels):
     all_text = list()
     xys = list()
     for tspan in textEl.xpath(
-        'svg:tspan', namespaces=INKSVG_NAMESPACES):
+            'svg:tspan', namespaces=INKSVG_NAMESPACES):
         span_style = style.copy()
         if 'style' in tspan.attrib:
             span_style.update(split_svg_style(tspan.attrib['style']))
