@@ -197,11 +197,8 @@ def interpret_svg_text(textEl, labels):
     for tspan in textEl.xpath(
             'svg:tspan', namespaces=INKSVG_NAMESPACES):
         all_text.append(tspan.text)
-        # position and angle
-        pos, angle = _get_tspan_pos_angle(tspan)
-        xys.append(pos)
-        tex_label = TeXLabel(pos, '')
-        tex_label.angle = angle
+        tex_label = _make_tex_label(tspan)
+        xys.append(tex_label.pos)
         # name = tspan.attrib['id']
         # text_ids.add(name)
         # style
@@ -217,6 +214,14 @@ def interpret_svg_text(textEl, labels):
     tex_label.pos = xys[0]
     labels.append(tex_label)
     return text_ids
+
+
+def _make_tex_label(tspan):
+    # position and angle
+    pos, angle = _get_tspan_pos_angle(tspan)
+    tex_label = TeXLabel(pos, '')
+    tex_label.angle = angle
+    return tex_label
 
 
 def _get_tspan_pos_angle(tspan):
