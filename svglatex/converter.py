@@ -131,32 +131,9 @@ def main(svg_fname):
     xml, text_ids, ignore_ids, labels = process_svg(svg_fname)
     pdf_bboxes = generate_pdf_from_svg_using_inkscape(xml, pdfpath)
     pdf_bbox = pdf_bounding_box(pdf_bboxes)
-    # get bounding boxes
-    xs = set()
-    ys = set()
     svg_bboxes = svg_bounding_boxes(svg_fname)
-    # pprint.pprint(svg_bboxes)
-    for name in text_ids:
-        d = svg_bboxes.get(name)
-        if name in ignore_ids or d is None:
-            continue
-        x, _, y, _ = corners(d)
-        xs.add(x)
-        ys.add(y)
-    # overall bounding box
-    xs.add(xmin)
-    xs.add(xmax)
-    ys.add(ymin)
-    ys.add(ymax)
-    x_min = min(xs)
-    x_max = max(xs)
-    y_min = min(ys)
-    y_max = max(ys)
-    svg_bbox = BBox(
-        x=x_min,
-        y=y_min,
-        width=x_max - x_min,
-        height=y_max - y_min)
+    svg_bbox = svg_bounding_box(
+        svg_bboxes, text_ids, ignore_ids, pdf_bbox)
     tex = TeXPicture(svg_bbox, pdf_bbox)
     tex.labels = labels
     tex.backgroundGraphic = pdfpath
@@ -420,6 +397,40 @@ def pdf_bounding_box(pdf_bboxes):
         width=xmax - xmin,
         height=ymax - ymin)
     return pdf_bbox
+
+
+def svg_bounding_box(
+        svg_bboxes, text_ids, ignore_ids, pdf_bbox):
+    """Return initial SVG bounding box."""
+    xs = set()
+    ys = set()
+    # pprint.pprint(svg_bboxes)
+    for name in text_ids:
+        d = svg_bboxes.get(name)
+        if name in ignore_ids or d is None:
+            continue
+        x, _, y, _ = corners(d)
+        xs.add(x)
+        ys.add(y)
+    # overall bounding box
+    xmin = pdf_bbox.x
+    ymin = pdf_bbox.y
+    xmax = xmin + pdf_bbox.width
+    ymax = ymin + pdf_bbox.height
+    xs.add(xmin)
+    xs.add(xmax)
+    ys.add(ymin)
+    ys.add(ymax)
+    x_min = min(xs)
+    x_max = max(xs)
+    y_min = min(ys)
+    y_max = max(ys)
+    svg_bbox = BBox(
+        x=x_min,
+        y=y_min,
+        width=x_max - x_min,
+        height=y_max - y_min)
+    return svg_bbox
 
 
 def svg_bounding_boxes(svgfile):
