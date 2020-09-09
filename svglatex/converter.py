@@ -128,7 +128,7 @@ def main(svg_fname):
     texpath = '{fname}.pdf_tex'.format(fname=fname)
     pdfpath = '{fname}.pdf'.format(fname=fname)
     # convert
-    xml, text_ids, ignore_ids, labels = process_svg(svg_fname)
+    xml, text_ids, ignore_ids, labels = split_text_graphics(svg_fname)
     pdf_bboxes = generate_pdf_from_svg_using_inkscape(xml, pdfpath)
     pdf_bbox = pdf_bounding_box(pdf_bboxes)
     svg_bboxes = svg_bounding_boxes(svg_fname)
@@ -140,7 +140,7 @@ def main(svg_fname):
         f.write(pdf_tex_contents)
 
 
-def process_svg(inpath):
+def split_text_graphics(inpath):
     doc = etree.parse(inpath)
     _print_svg_units(doc)
     text = doc.xpath(
