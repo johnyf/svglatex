@@ -273,29 +273,25 @@ def compute_svg_transform(el):
 
 def parse_svg_transform(attribute):
     m = RX_TRANSFORM.match(attribute)
-    if m is None:
-        raise Exception('bad transform (' + attribute + ')')
+    assert m is not None, 'bad transform (' + attribute + ')'
     func = m.group(1)
     args = [float(x.strip()) for x in m.group(2).split(',')]
     xform = AffineTransform()
     if func == 'matrix':
-        if len(args) != 6:
-            raise Exception('bad matrix transform')
+        assert len(args) == 6, args
         xform.matrix(*args)
     elif func == 'translate':
-        if len(args) < 1 or len(args) > 2:
-            raise Exception('bad translate transform')
+        assert len(args) in (1, 2), args
         tx = args[0]
         ty = args[1] if len(args) > 1 else 0.0
         xform.translate(tx, ty)
     elif func == 'scale':
-        if len(args) < 1 or len(args) > 2:
-            raise Exception('bad scale transform')
+        assert len(args) in (1, 2), args
         sx = args[0]
         sy = args[1] if len(args) > 1 else sx
         xform.scale(sx, sy)
     elif func == 'rotate':
-        assert len(args) == 1 or len(args) == 3, args
+        assert len(args) in (1, 3), args
         if len(args) == 1:
             args.extend([0, 0])  # cx, cy
         xform.rotate_degrees(*args)
