@@ -134,10 +134,10 @@ def main(svg_fname):
     # get bounding boxes
     xs = set()
     ys = set()
-    bboxes = svg_bounding_boxes(svg_fname)
-    # pprint.pprint(bboxes)
+    svg_bboxes = svg_bounding_boxes(svg_fname)
+    # pprint.pprint(svg_bboxes)
     for name in text_ids:
-        d = bboxes.get(name)
+        d = svg_bboxes.get(name)
         if name in ignore_ids or d is None:
             continue
         x, _, y, _ = corners(d)
