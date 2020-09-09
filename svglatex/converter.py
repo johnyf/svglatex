@@ -449,6 +449,7 @@ def which_inkscape():
 
 
 def parse_bbox_string(line):
+    """Return `x, y, w, h` from bounding box string."""
     split = line.split(',')
     name = split[0]
     x, y, w, h = [float(x) for x in split[1:]]
@@ -456,6 +457,11 @@ def parse_bbox_string(line):
 
 
 def corners(d):
+    """Return corner coordinates.
+
+    @param d: `dict` with keys
+        `'x', 'y', 'w', 'h'`
+    """
     x = d['x']
     y = d['y']
     w = d['w']
