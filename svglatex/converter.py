@@ -130,16 +130,7 @@ def main(svg_fname):
     # convert
     xml, text_ids, ignore_ids, labels = process_svg(svg_fname)
     pdf_bboxes = generate_pdf_from_svg_using_inkscape(xml, pdfpath)
-    # Drawing area coordinates within SVG
-    for k, d in pdf_bboxes.items():
-        if k.startswith('svg'):
-            break
-    xmin, xmax, ymin, ymax = corners(d)
-    pdf_bbox = BBox(
-        x=xmin,
-        y=ymin,
-        width=xmax - xmin,
-        height=ymax - ymin)
+    pdf_bbox = pdf_bounding_box(pdf_bboxes)
     # get bounding boxes
     xs = set()
     ys = set()
@@ -170,7 +161,7 @@ def main(svg_fname):
     tex.labels = labels
     tex.backgroundGraphic = pdfpath
     with open(texpath, 'w', encoding='utf-8') as f:
-        tex.emit_picture(f, xmax - xmin)
+        tex.emit_picture(f, pdf_bbox.width)
 
 
 def process_svg(inpath):
@@ -414,6 +405,21 @@ def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
             file_obj=tmpsvg,
             write_to=pdfpath)
     return bboxes
+
+
+def pdf_bounding_box(pdf_bboxes):
+    """Return PDF bounding box."""
+    # Drawing area coordinates within SVG
+    for k, d in pdf_bboxes.items():
+        if k.startswith('svg'):
+            break
+    xmin, xmax, ymin, ymax = corners(d)
+    pdf_bbox = BBox(
+        x=xmin,
+        y=ymin,
+        width=xmax - xmin,
+        height=ymax - ymin)
+    return pdf_bbox
 
 
 def svg_bounding_boxes(svgfile):
