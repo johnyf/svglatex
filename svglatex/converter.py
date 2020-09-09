@@ -134,9 +134,7 @@ def main(svg_fname):
     svg_bboxes = svg_bounding_boxes(svg_fname)
     svg_bbox = svg_bounding_box(
         svg_bboxes, text_ids, ignore_ids, pdf_bbox)
-    tex = TeXPicture(svg_bbox, pdf_bbox)
-    tex.labels = labels
-    tex.background_graphics = pdfpath
+    tex = TeXPicture(svg_bbox, pdf_bbox, pdfpath, labels)
     pdf_tex_contents = tex.dumps()
     with open(texpath, 'w', encoding='utf-8') as f:
         f.write(pdf_tex_contents)
@@ -627,11 +625,15 @@ class TeXLabel(object):
 
 class TeXPicture(object):
 
-    def __init__(self, svg_bbox, pdf_bbox):
+    def __init__(
+            self, svg_bbox, pdf_bbox,
+            fname=None, labels=None):
         self.svg_bbox = svg_bbox
         self.pdf_bbox = pdf_bbox
-        self.background_graphics = None
-        self.labels = list()
+        self.background_graphics = fname
+        if labels is None:
+            labels = list()
+        self.labels = labels
 
     def dumps(self):
         unit = self.svg_bbox.width
