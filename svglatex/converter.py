@@ -413,8 +413,11 @@ def svg_bounding_boxes(svgfile):
         '--without-gui',
         '--query-all',
         '--file={s}'.format(s=path)]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
-    lines = p.stdout.readlines()
+    with subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            universal_newlines=True) as proc:
+        lines = proc.stdout.readlines()
     bboxes = dict()
     for line in lines:
         name, x, y, w, h = parse_line(line)
