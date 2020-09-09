@@ -121,7 +121,8 @@ def parse_args():
 
 
 def main(svg_fname):
-    fname = os.path.splitext(svg_fname)[0]
+    fname, ext = os.path.splitext(svg_fname)
+    assert ext == '.svg', ext
     texpath = '{fname}.pdf_tex'.format(fname=fname)
     pdfpath = '{fname}.pdf'.format(fname=fname)
     # convert
