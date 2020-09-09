@@ -138,7 +138,7 @@ def main(svg_fname):
     tex.labels = labels
     tex.backgroundGraphic = pdfpath
     with open(texpath, 'w', encoding='utf-8') as f:
-        tex.emit_picture(f, pdf_bbox.width)
+        tex.emit_picture(f)
 
 
 def process_svg(inpath):
@@ -632,7 +632,7 @@ class TeXPicture(object):
         self.backgroundGraphic = None
         self.labels = list()
 
-    def emit_picture(self, stream, wpdf):
+    def emit_picture(self, stream):
         unit = self.svg_bbox.width
         xmin = self.svg_bbox.x
         ymin = self.svg_bbox.y
@@ -652,7 +652,6 @@ class TeXPicture(object):
                 '}}%').format(
                     scale=scale,
                     x=x, y=y,
-                    # width=wpdf,
                     img=self.backgroundGraphic)
             c.append(s)
         for label in self.labels:
