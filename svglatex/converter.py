@@ -208,79 +208,79 @@ def interpret_svg_text(textEl, labels):
         # text_ids.add(name)
         angle = -round(xform.get_rotation(), 3)
         all_text.append(tspan.text)
-        texLabel = TeXLabel(pos, '')
-        texLabel.angle = angle
-        _set_fill(texLabel, span_style)
-        _set_font_weight(texLabel, span_style)
-        _set_font_style(texLabel, span_style)
-        _set_text_anchor(texLabel, span_style)
-        _set_font_family(texLabel, span_style)
-        _set_font_size(texLabel, span_style)
+        tex_label = TeXLabel(pos, '')
+        tex_label.angle = angle
+        _set_fill(tex_label, span_style)
+        _set_font_weight(tex_label, span_style)
+        _set_font_style(tex_label, span_style)
+        _set_text_anchor(tex_label, span_style)
+        _set_font_family(tex_label, span_style)
+        _set_font_size(tex_label, span_style)
     all_text = [s for s in all_text if s is not None]
-    texLabel.text = ' '.join(all_text)
-    texLabel.pos = xys[0]
-    labels.append(texLabel)
+    tex_label.text = ' '.join(all_text)
+    tex_label.pos = xys[0]
+    labels.append(tex_label)
     return text_ids
 
 
-def _set_fill(texLabel, span_style):
+def _set_fill(tex_label, span_style):
     if 'fill' not in span_style:
         return
-    texLabel.color = parse_svg_color(span_style['fill'])
+    tex_label.color = parse_svg_color(span_style['fill'])
 
 
-def _set_font_weight(texLabel, span_style):
+def _set_font_weight(tex_label, span_style):
     if 'font-weight' not in span_style:
         return
     weight = span_style['font-weight']
     if weight == 'bold':
-        texLabel.fontweight = WEIGHT_BOLD
+        tex_label.fontweight = WEIGHT_BOLD
     elif weight == 'normal':
-        texLabel.fontweight = WEIGHT_NORMAL
+        tex_label.fontweight = WEIGHT_NORMAL
     else:
-        texLabel.fontweight = int(weight)
+        tex_label.fontweight = int(weight)
 
 
-def _set_font_style(texLabel, span_style):
+def _set_font_style(tex_label, span_style):
     if 'font-style' not in span_style:
         return
     fstyle = span_style['font-style']
     if fstyle == 'normal':
-        texLabel.fontstyle = STYLE_NORMAL
+        tex_label.fontstyle = STYLE_NORMAL
     elif fstyle == 'italic':
-        texLabel.fontstyle = STYLE_ITALIC
+        tex_label.fontstyle = STYLE_ITALIC
     elif fstyle == 'oblique':
-        texLabel.fontstyle = STYLE_OBLIQUE
+        tex_label.fontstyle = STYLE_OBLIQUE
 
 
-def _set_text_anchor(texLabel, span_style):
+def _set_text_anchor(tex_label, span_style):
     if 'text-anchor' not in span_style:
         return
     anchor = span_style['text-anchor']
     if anchor == 'start':
-        texLabel.align = ALIGN_LEFT
+        tex_label.align = ALIGN_LEFT
     elif anchor == 'end':
-        texLabel.align = ALIGN_RIGHT
+        tex_label.align = ALIGN_RIGHT
     elif anchor == 'middle':
-        texLabel.align = ALIGN_CENTER
+        tex_label.align = ALIGN_CENTER
 
 
-def _set_font_family(texLabel, span_style):
+def _set_font_family(tex_label, span_style):
     if 'font-family' not in span_style:
         return
     ff = span_style['font-family']
     if ff in FONT_MAP:
-        texLabel.fontfamily = FONT_MAP[ff]
+        tex_label.fontfamily = FONT_MAP[ff]
     else:
         print('Could not match font-family', ff)
 
 
-def _set_font_size(texLabel, span_style):
+def _set_font_size(tex_label, span_style):
     if 'font-size' not in span_style:
         return
     fs = span_style['font-size']
     if fs in FONT_SIZE_MAP:
-        texLabel.fontsize = FONT_SIZE_MAP[fs]
+        tex_label.fontsize = FONT_SIZE_MAP[fs]
     else:
         print('Could not match font-size', fs)
 
