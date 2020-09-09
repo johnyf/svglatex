@@ -276,30 +276,52 @@ def parse_svg_transform(attribute):
     assert m is not None, 'bad transform (' + attribute + ')'
     func = m.group(1)
     args = [float(x.strip()) for x in m.group(2).split(',')]
-    xform = AffineTransform()
     if func == 'matrix':
-        assert len(args) == 6, args
-        xform.matrix(*args)
+        return _make_matrix_transform(args)
     elif func == 'translate':
-        assert len(args) in (1, 2), args
-        tx = args[0]
-        ty = args[1] if len(args) > 1 else 0.0
-        xform.translate(tx, ty)
+        return _make_translation_transform(args)
     elif func == 'scale':
-        assert len(args) in (1, 2), args
-        sx = args[0]
-        sy = args[1] if len(args) > 1 else sx
-        xform.scale(sx, sy)
+        return _make_scaling_transform(args)
     elif func == 'rotate':
-        assert len(args) in (1, 3), args
-        if len(args) == 1:
-            args.extend([0, 0])  # cx, cy
-        xform.rotate_degrees(*args)
-        print('WARNING: text rotation (not tested)')
+        return _make_rotation_transform(args)
     else:
         raise Exception(
             'unsupported transform attribute ({a})'.format(
                 a=attribute))
+
+
+def _make_matrix_transform(args):
+    assert len(args) == 6, args
+    xform = AffineTransform()
+    xform.matrix(*args)
+    return xform
+
+
+def _make_translation_transform(args):
+    assert len(args) in (1, 2), args
+    tx = args[0]
+    ty = args[1] if len(args) > 1 else 0.0
+    xform = AffineTransform()
+    xform.translate(tx, ty)
+    return xform
+
+
+def _make_scaling_transform(args):
+    assert len(args) in (1, 2), args
+    sx = args[0]
+    sy = args[1] if len(args) > 1 else sx
+    xform = AffineTransform()
+    xform.scale(sx, sy)
+    return xform
+
+
+def _make_rotation_transform(args):
+    assert len(args) in (1, 3), args
+    if len(args) == 1:
+        args.extend([0, 0])  # cx, cy
+    xform = AffineTransform()
+    xform.rotate_degrees(*args)
+    print('WARNING: text rotation (not tested)')
     return xform
 
 
