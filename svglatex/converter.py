@@ -136,7 +136,7 @@ def main(svg_fname):
         svg_bboxes, text_ids, ignore_ids, pdf_bbox)
     tex = TeXPicture(svg_bbox, pdf_bbox)
     tex.labels = labels
-    tex.backgroundGraphic = pdfpath
+    tex.background_graphics = pdfpath
     pdf_tex_contents = tex.dumps()
     with open(texpath, 'w', encoding='utf-8') as f:
         f.write(pdf_tex_contents)
@@ -630,7 +630,7 @@ class TeXPicture(object):
     def __init__(self, svg_bbox, pdf_bbox):
         self.svg_bbox = svg_bbox
         self.pdf_bbox = pdf_bbox
-        self.backgroundGraphic = None
+        self.background_graphics = None
         self.labels = list()
 
     def dumps(self):
@@ -640,7 +640,7 @@ class TeXPicture(object):
         w = self.svg_bbox.width
         h = self.svg_bbox.height
         c = list()
-        if self.backgroundGraphic is not None:
+        if self.background_graphics is not None:
             x = self.pdf_bbox.x - xmin
             # the SVG coordinate system origin is at the top left corner
             # whereas the `picture` origin is at the lower left corner
@@ -653,7 +653,7 @@ class TeXPicture(object):
                 '}}%').format(
                     scale=scale,
                     x=x, y=y,
-                    img=self.backgroundGraphic)
+                    img=self.background_graphics)
             c.append(s)
         for label in self.labels:
             x, y = label.pos
