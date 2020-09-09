@@ -570,7 +570,8 @@ class TeXLabel(object):
 
         r, g, b = self.color
         if (r != 0) or (g != 0) or (b != 0):
-            color = '\\color[RGB]{{{},{},{}}}'.format(r, g, b)
+            color = '\\color[RGB]{{{r},{g},{b}}}'.format(
+                r=r, g=g, b=b)
 
         font = '\\' + self.fontfamily + 'family'
         if self.fontweight >= WEIGHT_BOLD:
