@@ -130,6 +130,16 @@ def main(svg_fname):
     # convert
     xml, text_ids, ignore_ids, labels = process_svg(svg_fname)
     pdf_bboxes = generate_pdf_from_svg_using_inkscape(xml, pdfpath)
+    # Drawing area coordinates within SVG
+    for k, d in pdf_bboxes.items():
+        if k.startswith('svg'):
+            break
+    xmin, xmax, ymin, ymax = corners(d)
+    pdf_bbox = BBox(
+        x=xmin,
+        y=ymin,
+        width=xmax - xmin,
+        height=ymax - ymin)
     # get bounding boxes
     xs = set()
     ys = set()
@@ -142,16 +152,6 @@ def main(svg_fname):
         x, _, y, _ = corners(d)
         xs.add(x)
         ys.add(y)
-    # Drawing area coordinates within SVG
-    for k, d in pdf_bboxes.items():
-        if k.startswith('svg'):
-            break
-    xmin, xmax, ymin, ymax = corners(d)
-    pdf_bbox = BBox(
-        x=xmin,
-        y=ymin,
-        width=xmax - xmin,
-        height=ymax - ymin)
     # overall bounding box
     xs.add(xmin)
     xs.add(xmax)
