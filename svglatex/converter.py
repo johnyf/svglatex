@@ -408,13 +408,13 @@ def svg_bounding_boxes(svgfile):
     """Parses the output from inkscape `--query-all`."""
     inkscape = which_inkscape()
     path = os.path.realpath(svgfile)
-    cmd = [
+    args = [
         inkscape,
         '--without-gui',
         '--query-all',
         '--file={s}'.format(s=path)]
     with subprocess.Popen(
-            cmd,
+            args,
             stdout=subprocess.PIPE,
             universal_newlines=True) as proc:
         lines = proc.stdout.readlines()
