@@ -137,8 +137,9 @@ def main(svg_fname):
     tex = TeXPicture(svg_bbox, pdf_bbox)
     tex.labels = labels
     tex.backgroundGraphic = pdfpath
+    pdf_tex_contents = tex.dumps()
     with open(texpath, 'w', encoding='utf-8') as f:
-        tex.emit_picture(f)
+        f.write(pdf_tex_contents)
 
 
 def process_svg(inpath):
@@ -632,7 +633,7 @@ class TeXPicture(object):
         self.backgroundGraphic = None
         self.labels = list()
 
-    def emit_picture(self, stream):
+    def dumps(self):
         unit = self.svg_bbox.width
         xmin = self.svg_bbox.x
         ymin = self.svg_bbox.y
@@ -676,7 +677,7 @@ class TeXPicture(object):
             '\n'.join(c) + '\n' +
             '\\end{picture}%\n'
             '\\endgroup%\n')
-        stream.write(s)
+        return s
 
     def add_label(self, label):
         self.labels.append(label)
