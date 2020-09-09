@@ -418,6 +418,14 @@ def svg_bounding_boxes(svgfile):
             stdout=subprocess.PIPE,
             universal_newlines=True) as proc:
         lines = proc.stdout.readlines()
+        proc.wait()
+        if proc.returncode != 0:
+            raise Exception((
+                '`{inkscape}` exited with '
+                'return code {rcode}'
+                ).format(
+                    inkscape=inkscape,
+                    rcode=proc.returncode))
     bboxes = dict()
     for line in lines:
         name, x, y, w, h = parse_line(line)
