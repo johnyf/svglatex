@@ -338,7 +338,13 @@ def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
         with subprocess.Popen(args) as proc:
             proc.wait()
             if proc.returncode != 0:
-                sys.stderr.write('inkscape svg->pdf failed')
+                raise Exception((
+                    '`{inkscape}` conversion of SVG '
+                    'to PDF failed with return code '
+                    '{rcode}'
+                    ).format(
+                        inkscape=inkscape,
+                        rcode=proc.returncode))
     return bboxes
 
 
