@@ -97,14 +97,11 @@ STYLE_NORMAL = 0
 STYLE_ITALIC = 1
 STYLE_OBLIQUE = 2
 # namespaces
-TEXTEXT_NS = r'http://www.iki.fi/pav/software/textext/'
-TEXTEXT_PREFIX = '{' + TEXTEXT_NS + '}'
 INKSVG_NAMESPACES = {
     'dc': r'http://purl.org/dc/elements/1.1/',
     'cc': r'http://creativecommons.org/ns#',
     'rdf': r'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
     'svg': r'http://www.w3.org/2000/svg',
-    'textext': TEXTEXT_NS,
     'xlink': r'http://www.w3.org/1999/xlink',
     'sodipodi': (r'http://sodipodi.sourceforge.net/'
                  r'DTD/sodipodi-0.dtd'),
@@ -145,8 +142,6 @@ def split_text_graphics(inpath):
     _print_svg_units(doc)
     text = doc.xpath(
         '//svg:text', namespaces=INKSVG_NAMESPACES)
-    textext = doc.xpath(
-        '//*[@textext:text]', namespaces=INKSVG_NAMESPACES)
     ignore_ids = set()
     for defs in doc.xpath(
             '//svg:defs', namespaces=INKSVG_NAMESPACES):
@@ -160,10 +155,6 @@ def split_text_graphics(inpath):
     for u in text:
         ids = interpret_svg_text(u, labels)
         text_ids.update(ids)
-        parent = u.getparent()
-        parent.remove(u)
-    for u in textext:
-        interpret_svg_textext(u, labels)
         parent = u.getparent()
         parent.remove(u)
     return doc, text_ids, ignore_ids, labels
@@ -323,29 +314,6 @@ def parse_svg_color(col):
         return (r, g, b)
     else:
         raise Exception('only hash-code colors are supported!')
-
-
-def interpret_svg_textext(textEl, labels):
-    texcode = textEl.attrib[TEXTEXT_PREFIX + 'text'].encode(
-        'utf-8').decode('unicode_escape')
-    xform = compute_svg_transform(textEl)
-    placedElements = textEl.xpath(
-        r'.//svg:use', namespaces=INKSVG_NAMESPACES)
-    if len(placedElements):
-        minX = 1e20
-        maxY = -1e20
-        for el in placedElements:
-            elPos = (float(el.attrib['x']), float(el.attrib['y']))
-            elPos = xform.applyTo(elPos)
-            x, y = elPos
-            if x < minX:
-                minX = x
-            if y > maxY:
-                maxY = y
-        pos = (minX, maxY)
-    else:
-        pos = (0.0, 0.0)
-    labels.append(RawTeXLabel(pos, texcode))
 
 
 def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
@@ -564,18 +532,6 @@ class AffineTransform(object):
         # TODO check that the matrix is orthogonal
         # TODO do a real matrix decomposition here!
         return math.degrees(math.atan2(m21, m11))
-
-
-class RawTeXLabel(object):
-
-    def __init__(self, pos, texcode):
-        self.pos = pos
-        self.code = texcode
-
-    def texcode(self):
-        return (
-            '\\scalebox{' + str(SVG_UNITS_TO_BIG_POINTS) +
-            '}{\\makebox(0,0)[bl]{%\n' + self.code + '%\n}}')
 
 
 class TeXLabel(object):
