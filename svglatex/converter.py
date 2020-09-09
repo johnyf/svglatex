@@ -592,7 +592,7 @@ class TeXLabel(object):
         font, color, align = '', '', ''
 
         r, g, b = self.color
-        if (r != 0) or (g != 0) or (b != 0):
+        if r != 0 or g != 0 or b != 0:
             color = '\\color[RGB]{{{r},{g},{b}}}'.format(
                 r=r, g=g, b=b)
 
