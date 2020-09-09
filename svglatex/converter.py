@@ -428,7 +428,7 @@ def svg_bounding_boxes(svgfile):
                     rcode=proc.returncode))
     bboxes = dict()
     for line in lines:
-        name, x, y, w, h = parse_line(line)
+        name, x, y, w, h = parse_bbox_string(line)
         bboxes[name] = dict(x=x, y=y, w=w, h=h)
     return bboxes
 
@@ -448,7 +448,7 @@ def which_inkscape():
     return inkscape_abspath
 
 
-def parse_line(line):
+def parse_bbox_string(line):
     split = line.split(',')
     name = split[0]
     x, y, w, h = [float(x) for x in split[1:]]
