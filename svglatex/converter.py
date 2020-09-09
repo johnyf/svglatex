@@ -196,17 +196,17 @@ def interpret_svg_text(textEl, labels):
     xys = list()
     for tspan in textEl.xpath(
             'svg:tspan', namespaces=INKSVG_NAMESPACES):
+        all_text.append(tspan.text)
         span_style = style.copy()
         if 'style' in tspan.attrib:
             st = split_svg_style(tspan.attrib['style'])
             span_style.update(st)
         pos, angle = _get_tspan_pos_angle(tspan)
         xys.append(pos)
-        # name = tspan.attrib['id']
-        # text_ids.add(name)
-        all_text.append(tspan.text)
         tex_label = TeXLabel(pos, '')
         tex_label.angle = angle
+        # name = tspan.attrib['id']
+        # text_ids.add(name)
         _set_fill(tex_label, span_style)
         _set_font_weight(tex_label, span_style)
         _set_font_style(tex_label, span_style)
