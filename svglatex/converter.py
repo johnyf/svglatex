@@ -200,13 +200,10 @@ def interpret_svg_text(textEl, labels):
         if 'style' in tspan.attrib:
             st = split_svg_style(tspan.attrib['style'])
             span_style.update(st)
-        xform = compute_svg_transform(tspan)
-        pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
-        pos = xform.applyTo(pos)
+        pos, angle = _get_tspan_pos_angle(tspan)
         xys.append(pos)
         # name = tspan.attrib['id']
         # text_ids.add(name)
-        angle = -round(xform.get_rotation(), 3)
         all_text.append(tspan.text)
         tex_label = TeXLabel(pos, '')
         tex_label.angle = angle
@@ -221,6 +218,14 @@ def interpret_svg_text(textEl, labels):
     tex_label.pos = xys[0]
     labels.append(tex_label)
     return text_ids
+
+
+def _get_tspan_pos_angle(tspan):
+    xform = compute_svg_transform(tspan)
+    pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
+    pos = xform.applyTo(pos)
+    angle = - round(xform.get_rotation(), 3)
+    return pos, angle
 
 
 def _set_fill(tex_label, span_style):
