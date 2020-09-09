@@ -224,59 +224,65 @@ def interpret_svg_text(textEl, labels):
 
 
 def _set_fill(texLabel, span_style):
-    if 'fill' in span_style:
-        texLabel.color = parse_svg_color(span_style['fill'])
+    if 'fill' not in span_style:
+        return
+    texLabel.color = parse_svg_color(span_style['fill'])
 
 
 def _set_font_weight(texLabel, span_style):
-    if 'font-weight' in span_style:
-        weight = span_style['font-weight']
-        if weight == 'bold':
-            texLabel.fontweight = WEIGHT_BOLD
-        elif weight == 'normal':
-            texLabel.fontweight = WEIGHT_NORMAL
-        else:
-            texLabel.fontweight = int(weight)
+    if 'font-weight' not in span_style:
+        return
+    weight = span_style['font-weight']
+    if weight == 'bold':
+        texLabel.fontweight = WEIGHT_BOLD
+    elif weight == 'normal':
+        texLabel.fontweight = WEIGHT_NORMAL
+    else:
+        texLabel.fontweight = int(weight)
 
 
 def _set_font_style(texLabel, span_style):
-    if 'font-style' in span_style:
-        fstyle = span_style['font-style']
-        if fstyle == 'normal':
-            texLabel.fontstyle = STYLE_NORMAL
-        elif fstyle == 'italic':
-            texLabel.fontstyle = STYLE_ITALIC
-        elif fstyle == 'oblique':
-            texLabel.fontstyle = STYLE_OBLIQUE
+    if 'font-style' not in span_style:
+        return
+    fstyle = span_style['font-style']
+    if fstyle == 'normal':
+        texLabel.fontstyle = STYLE_NORMAL
+    elif fstyle == 'italic':
+        texLabel.fontstyle = STYLE_ITALIC
+    elif fstyle == 'oblique':
+        texLabel.fontstyle = STYLE_OBLIQUE
 
 
 def _set_text_anchor(texLabel, span_style):
-    if 'text-anchor' in span_style:
-        anchor = span_style['text-anchor']
-        if anchor == 'start':
-            texLabel.align = ALIGN_LEFT
-        elif anchor == 'end':
-            texLabel.align = ALIGN_RIGHT
-        elif anchor == 'middle':
-            texLabel.align = ALIGN_CENTER
+    if 'text-anchor' not in span_style:
+        return
+    anchor = span_style['text-anchor']
+    if anchor == 'start':
+        texLabel.align = ALIGN_LEFT
+    elif anchor == 'end':
+        texLabel.align = ALIGN_RIGHT
+    elif anchor == 'middle':
+        texLabel.align = ALIGN_CENTER
 
 
 def _set_font_family(texLabel, span_style):
-    if 'font-family' in span_style:
-        ff = span_style['font-family']
-        if ff in FONT_MAP:
-            texLabel.fontfamily = FONT_MAP[ff]
-        else:
-            print('Could not match font-family', ff)
+    if 'font-family' not in span_style:
+        return
+    ff = span_style['font-family']
+    if ff in FONT_MAP:
+        texLabel.fontfamily = FONT_MAP[ff]
+    else:
+        print('Could not match font-family', ff)
 
 
 def _set_font_size(texLabel, span_style):
-    if 'font-size' in span_style:
-        fs = span_style['font-size']
-        if fs in FONT_SIZE_MAP:
-            texLabel.fontsize = FONT_SIZE_MAP[fs]
-        else:
-            print('Could not match font-size', fs)
+    if 'font-size' not in span_style:
+        return
+    fs = span_style['font-size']
+    if fs in FONT_SIZE_MAP:
+        texLabel.fontsize = FONT_SIZE_MAP[fs]
+    else:
+        print('Could not match font-size', fs)
 
 
 def split_svg_style(style):
