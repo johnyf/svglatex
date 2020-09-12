@@ -257,7 +257,7 @@ def _get_tspan_pos_angle(tspan):
     """Compute position and orientation of `tspan`."""
     xform = _compute_svg_transform(tspan)
     pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
-    pos = xform.applyTo(pos)
+    pos = xform.apply(pos)
     angle = - round(xform.get_rotation(), 3)
     return pos, angle
 
@@ -709,7 +709,7 @@ class _AffineTransform(object):
         self.m = (ma, mb, mc, md)
         self.t = (me, mf)
 
-    def applyTo(self, x, y=None):
+    def apply(self, x, y=None):
         """Transform position `x, y`."""
         if y is None:
             x, y = x
