@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # vim: set ts=4 sw=4 noet ai:
 #
-# This file is from:
+# Based on:
 # https://github.com/johnbartholomew/svg2latex/blob/
 # b77623b617b9b92c131a8eafe09ec1b1abed93f2/svg2latex.py
 #
