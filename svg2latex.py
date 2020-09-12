@@ -429,6 +429,7 @@ def interpret_svg_text(textEl, labels):
                 texLabel.fontsize = FONT_SIZE_MAP[fs]
             else:
                 print('Could not match font-size', fs)
+    all_text = [s for s in all_text if s is not None]
     texLabel.text = ' '.join(all_text)
     texLabel.pos = xys[0]
     labels.append(texLabel)
