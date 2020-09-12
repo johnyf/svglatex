@@ -908,5 +908,6 @@ def _round(*args, unit=1):
 
 
 if __name__ == '__main__':
+    # respond to call from a command line
     args = _parse_args()
     convert(args.fname)
