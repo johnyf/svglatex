@@ -126,7 +126,7 @@ def convert_svg(svg, out, out_type):
     """Convert from SVG to output format."""
     assert out_type in ('latex-pdf', 'pdf'), out_type
     if out_type == 'latex-pdf':
-        converter.main(svg)
+        converter.convert(svg)
     elif out_type == 'pdf':
         inkscape = converter.which_inkscape()
         svg_path = os.path.realpath(svg)

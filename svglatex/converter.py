@@ -119,7 +119,7 @@ def parse_args():
     return args
 
 
-def main(svg_fname):
+def convert(svg_fname):
     fname, ext = os.path.splitext(svg_fname)
     assert ext == '.svg', ext
     texpath = '{fname}.pdf_tex'.format(fname=fname)
@@ -772,4 +772,4 @@ def _round(*args, unit=1):
 
 if __name__ == '__main__':
     args = parse_args()
-    main(args.fname)
+    convert(args.fname)
