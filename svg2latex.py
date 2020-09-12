@@ -39,6 +39,7 @@
 #
 """Export SVG to PDF + LaTeX."""
 import argparse
+import collections
 import math
 import os
 import pprint
@@ -112,6 +113,9 @@ INKSVG_NAMESPACES = {
 }
 
 RX_TRANSFORM = re.compile('^\s*(\w+)\(([0-9,\s\.-]*)\)\s*$')
+
+
+BBox = collections.namedtuple('BBox', ['x', 'y', 'width', 'height'])
 
 
 class AffineTransform(object):
@@ -256,50 +260,52 @@ class TeXLabel(object):
 
 class TeXPicture(object):
 
-    def __init__(self, xmin, xmax, ymin, ymax,
-                 xpdf, ypdf):
-        self.xmin = xmin
-        self.xmax = xmax
-        self.ymin = ymin
-        self.ymax = ymax
-        self.xpdf = xpdf
-        self.ypdf = ypdf
+    def __init__(self, svg_bbox, pdf_bbox):
+        self.svg_bbox = svg_bbox
+        self.pdf_bbox = pdf_bbox
         self.backgroundGraphic = None
         self.labels = list()
 
     def emit_picture(self, stream, wpdf):
-        w = self.xmax - self.xmin
-        h = self.ymax - self.ymin
+        unit = self.svg_bbox.width
+        xmin = self.svg_bbox.x
+        ymin = self.svg_bbox.y
+        w = self.svg_bbox.width
+        h = self.svg_bbox.height
         c = list()
         if self.backgroundGraphic is not None:
-            ypdf = w - self.ypdf + self.ymin
+            x = self.pdf_bbox.x - xmin
+            y = (h + ymin) - (self.pdf_bbox.height + self.pdf_bbox.y)
+            x, y = _round(x, y, unit=unit)
+            scale = self.pdf_bbox.width / unit
             s = (
                 '\\put({x}, {y}){{'
-                '\\includegraphics[width=\\unitlength]{{{img}}}'
+                '\\includegraphics[width={scale}\\unitlength]{{{img}}}'
                 '}}%').format(
-                    x=self.xpdf / w,
-                    y=ypdf / w,
-                    width=wpdf,
+                    scale=scale,
+                    x=x, y=y,
+                    # width=wpdf,
                     img=self.backgroundGraphic)
             c.append(s)
         for label in self.labels:
             x, y = label.pos
-            y = w - y + self.ymin
+            # y=0 top in SVG, bottom in `\picture`
+            x = x - xmin
+            y = (h + ymin) - y
+            x, y = _round(x, y, unit=unit)
             s = '\\put({x}, {y}){{{text}}}%'.format(
-                x=round(x, 3) / w,
-                y=round(y, 3) / w,
+                x=x, y=y,
                 text=label.texcode())
             c.append(s)
+        width, height = _round(w, h, unit=unit)
+        assert width == 1, width
         s = (
             '\\begingroup%\n' +
             PICTURE_PREAMBLE +
             ('\\begin{{picture}}'
-             '({width}, {height})'
-             '({xmin}, {ymin})%\n').format(
-                xmin=self.xmin / w,
-                ymin=0,
-                width=1,
-                height=h / w) +
+             '({width}, {height})%\n').format(
+                width=width,
+                height=height) +
             '\n'.join(c) + '\n' +
             '\\end{picture}%\n'
             '\\endgroup%\n')
@@ -307,6 +313,10 @@ class TeXPicture(object):
 
     def add_label(self, label):
         self.labels.append(label)
+
+
+def _round(*args, unit=1):
+    return tuple(round(x / unit, 3) for x in args)
 
 
 def parse_svg_transform(attribute):
@@ -558,12 +568,16 @@ def main(svg_fname):
         if k.startswith('svg'):
             break
     xmin, xmax, ymin, ymax = corners(d)
+    pdf_bbox = BBox(
+        x=xmin,
+        y=ymin,
+        width=xmax - xmin,
+        height=ymax - ymin)
+    # overall bounding box
     xs.add(xmin)
     xs.add(xmax)
     ys.add(ymin)
     ys.add(ymax)
-    x_pdf = xmin
-    y_pdf = ymax
     x_min = min(xs)
     x_max = max(xs)
     y_min = min(ys)
@@ -572,7 +586,12 @@ def main(svg_fname):
            'y_min = {y_min}, y_max = {y_max}\n').format(
                x_min=x_min, x_max=x_max,
                y_min=y_min, y_max=y_max))
-    tex = TeXPicture(x_min, x_max, y_min, y_max, x_pdf, y_pdf)
+    svg_bbox = BBox(
+        x=x_min,
+        y=y_min,
+        width=x_max - x_min,
+        height=y_max - y_min)
+    tex = TeXPicture(svg_bbox, pdf_bbox)
     tex.labels = labels
     tex.backgroundGraphic = pdfpath
     with open(texpath, 'w', encoding='utf-8') as f:
