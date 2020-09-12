@@ -600,7 +600,7 @@ def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
                       xml_declaration=True)
         tmpsvg.flush()
         bboxes = svg_bounding_boxes(tmpsvg.name)
-        shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
+        # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
         cairosvg.svg2pdf(
             file_obj=tmpsvg,
             write_to=pdfpath)
@@ -620,7 +620,7 @@ def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
                       xml_declaration=True)
         tmpsvg.flush()
         bboxes = svg_bounding_boxes(tmpsvg.name)
-        shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
+        # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
         args.append(tmpsvg.name)
         with subprocess.Popen(args) as proc:
             proc.wait()
