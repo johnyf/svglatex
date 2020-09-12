@@ -377,10 +377,10 @@ def _make_rotation_transform(args):
 
 def _parse_svg_color(color):
     if color[0] == '#':
-        r = int(color[1:3], 16)
-        g = int(color[3:5], 16)
-        b = int(color[5:7], 16)
-        return (r, g, b)
+        red = int(color[1:3], 16)
+        green = int(color[3:5], 16)
+        blue = int(color[5:7], 16)
+        return (red, green, blue)
     else:
         raise Exception('only hash-code colors are supported!')
 
