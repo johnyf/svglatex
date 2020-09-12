@@ -45,6 +45,7 @@ import pprint
 import re
 import subprocess
 import sys
+import shutil
 import tempfile
 
 import lxml.etree as etree
@@ -532,6 +533,7 @@ def generate_pdf_from_svg(svgData, pdfpath):
                       xml_declaration=True)
         tmpsvg.flush()
         bboxes = svg_bounding_boxes(tmpsvg.name)
+        shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
         args.append(tmpsvg.name)
         with subprocess.Popen(args) as proc:
             proc.wait()
