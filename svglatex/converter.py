@@ -385,7 +385,7 @@ def parse_svg_color(col):
         raise Exception('only hash-code colors are supported!')
 
 
-def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
+def generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
     inkscape = which_inkscape()
     path = os.path.realpath(pdfpath)
     args = [inkscape,
@@ -396,7 +396,7 @@ def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
             '--export-pdf={path}'.format(path=path)]
     with tempfile.NamedTemporaryFile(
             suffix='.svg', delete=True) as tmpsvg:
-        svgData.write(tmpsvg, encoding='utf-8',
+        svg_data.write(tmpsvg, encoding='utf-8',
                       xml_declaration=True)
         tmpsvg.flush()
         bboxes = svg_bounding_boxes(tmpsvg.name)
@@ -416,10 +416,10 @@ def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
     return bboxes
 
 
-def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
+def generate_pdf_from_svg_using_cairo(svg_data, pdfpath):
     with tempfile.NamedTemporaryFile(
             suffix='.svg', delete=True) as tmpsvg:
-        svgData.write(tmpsvg, encoding='utf-8',
+        svg_data.write(tmpsvg, encoding='utf-8',
                       xml_declaration=True)
         tmpsvg.flush()
         bboxes = svg_bounding_boxes(tmpsvg.name)
