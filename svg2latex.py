@@ -49,7 +49,7 @@ import sys
 import shutil
 import tempfile
 
-import cairosvg
+# import cairosvg
 import lxml.etree as etree
 
 
