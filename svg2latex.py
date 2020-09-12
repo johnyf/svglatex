@@ -275,10 +275,10 @@ class TeXPicture(object):
             ypdf = w - self.ypdf + self.ymin
             s = (
                 '\\put({x}, {y}){{'
-                '\\includegraphics[width={width}pt]{{{img}}}'
+                '\\includegraphics[width=\\unitlength]{{{img}}}'
                 '}}%').format(
-                    x=self.xpdf,
-                    y=ypdf,
+                    x=self.xpdf / w,
+                    y=ypdf / w,
                     width=wpdf,
                     img=self.backgroundGraphic)
             c.append(s)
@@ -286,8 +286,8 @@ class TeXPicture(object):
             x, y = label.pos
             y = w - y + self.ymin
             s = '\\put({x}, {y}){{{text}}}%'.format(
-                x=round(x, 3),
-                y=round(y, 3),
+                x=round(x, 3) / w,
+                y=round(y, 3) / w,
                 text=label.texcode())
             c.append(s)
         s = (
@@ -296,10 +296,10 @@ class TeXPicture(object):
             ('\\begin{{picture}}'
              '({width}, {height})'
              '({xmin}, {ymin})%\n').format(
-                xmin=self.xmin,
+                xmin=self.xmin / w,
                 ymin=0,
-                width=w,
-                height=h) +
+                width=1,
+                height=h / w) +
             '\n'.join(c) + '\n' +
             '\\end{picture}%\n'
             '\\endgroup%\n')
