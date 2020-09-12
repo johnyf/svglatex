@@ -375,11 +375,11 @@ def _make_rotation_transform(args):
     return xform
 
 
-def _parse_svg_color(col):
-    if col[0] == '#':
-        r = int(col[1:3], 16)
-        g = int(col[3:5], 16)
-        b = int(col[5:7], 16)
+def _parse_svg_color(color):
+    if color[0] == '#':
+        r = int(color[1:3], 16)
+        g = int(color[3:5], 16)
+        b = int(color[5:7], 16)
         return (r, g, b)
     else:
         raise Exception('only hash-code colors are supported!')
