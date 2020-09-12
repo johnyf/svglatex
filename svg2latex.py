@@ -544,8 +544,8 @@ def main(svg_fname):
     pprint.pprint(bboxes)
     print(text_ids)
     for name in text_ids:
-        d = bboxes[name]
-        if name in ignore_ids:
+        d = bboxes.get(name)
+        if name in ignore_ids or d is None:
             continue
         x, _, y, _ = corners(d)
         xs.add(x)
