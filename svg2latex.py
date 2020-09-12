@@ -545,7 +545,7 @@ def main(svg_fname):
         if name not in text_ids:
             xs.add(x + w)
             ys.add(y + h)
-    d = pdf_bboxes['svg2']
+    d = pdf_bboxes.get('svg2')
     xmin, xmax, ymin, ymax = corners(d)
     xs.add(xmin)
     xs.add(xmax)
