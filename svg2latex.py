@@ -528,7 +528,7 @@ def main(svg_fname):
     pdfpath = '{fname}.pdf'.format(fname=fname)
     # convert
     xml, text_ids, ignore_ids, labels = process_svg(svg_fname)
-    pdf_bboxes = generate_pdf_from_svg(xml, pdfpath)
+    pdf_bboxes = generate_pdf_from_svg_using_inkscape(xml, pdfpath)
     # get bounding boxes
     xs = set()
     ys = set()
@@ -568,7 +568,7 @@ def main(svg_fname):
         tex.emit_picture(f, xmax - xmin)
 
 
-def generate_pdf_from_svg(svgData, pdfpath):
+def generate_pdf_from_svg_using_cairo(svgData, pdfpath):
     with tempfile.NamedTemporaryFile(
             suffix='.svg', delete=True) as tmpsvg:
         svgData.write(tmpsvg, encoding='utf-8',
