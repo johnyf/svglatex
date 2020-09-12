@@ -522,11 +522,7 @@ def process_svg(inpath):
     return doc, text_ids, ignore_ids, labels
 
 
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument('fname', type=str, help='svg file name')
-    args = p.parse_args()
-    svg_fname = args.fname
+def main(svg_fname):
     fname = os.path.splitext(svg_fname)[0]
     texpath = '{fname}.pdf_tex'.format(fname=fname)
     pdfpath = '{fname}.pdf'.format(fname=fname)
@@ -618,5 +614,13 @@ def corners(d):
     return x, xmax, y, ymax
 
 
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument('fname', type=str, help='svg file name')
+    args = p.parse_args()
+    return args
+
+
 if __name__ == '__main__':
-    main()
+    args = parse_args()
+    main(args.fname)
