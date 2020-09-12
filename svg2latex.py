@@ -552,7 +552,6 @@ def main(svg_fname):
     ys = set()
     bboxes = svg_bounding_boxes(svg_fname)
     pprint.pprint(bboxes)
-    print(text_ids)
     for name in text_ids:
         d = bboxes.get(name)
         if name in ignore_ids or d is None:
@@ -582,10 +581,6 @@ def main(svg_fname):
     x_max = max(xs)
     y_min = min(ys)
     y_max = max(ys)
-    print(('x_min = {x_min}, x_max = {x_max}\n'
-           'y_min = {y_min}, y_max = {y_max}\n').format(
-               x_min=x_min, x_max=x_max,
-               y_min=y_min, y_max=y_max))
     svg_bbox = BBox(
         x=x_min,
         y=y_min,
