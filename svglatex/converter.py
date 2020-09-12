@@ -122,18 +122,18 @@ def _parse_args():
 def convert(svg_fname):
     fname, ext = os.path.splitext(svg_fname)
     assert ext == '.svg', ext
-    texpath = '{fname}.pdf_tex'.format(fname=fname)
-    pdfpath = '{fname}.pdf'.format(fname=fname)
+    tex_path = '{fname}.pdf_tex'.format(fname=fname)
+    pdf_path = '{fname}.pdf'.format(fname=fname)
     # convert
     xml, text_ids, ignore_ids, labels = _split_text_graphics(svg_fname)
-    pdf_bboxes = _generate_pdf_from_svg_using_inkscape(xml, pdfpath)
+    pdf_bboxes = _generate_pdf_from_svg_using_inkscape(xml, pdf_path)
     pdf_bbox = _pdf_bounding_box(pdf_bboxes)
     svg_bboxes = _svg_bounding_boxes(svg_fname)
     svg_bbox = _svg_bounding_box(
         svg_bboxes, text_ids, ignore_ids, pdf_bbox)
-    tex = _TeXPicture(svg_bbox, pdf_bbox, pdfpath, labels)
+    tex = _TeXPicture(svg_bbox, pdf_bbox, pdf_path, labels)
     pdf_tex_contents = tex.dumps()
-    with open(texpath, 'w', encoding='utf-8') as f:
+    with open(tex_path, 'w', encoding='utf-8') as f:
         f.write(pdf_tex_contents)
 
 
