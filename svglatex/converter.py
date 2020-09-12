@@ -137,8 +137,8 @@ def convert(svg_fname):
         f.write(pdf_tex_contents)
 
 
-def split_text_graphics(inpath):
-    doc = etree.parse(inpath)
+def split_text_graphics(svg_fname):
+    doc = etree.parse(svg_fname)
     _print_svg_units(doc)
     text = doc.xpath(
         '//svg:text', namespaces=INKSVG_NAMESPACES)
