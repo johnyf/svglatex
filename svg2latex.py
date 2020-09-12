@@ -500,12 +500,13 @@ def process_svg(inpath):
         '//svg:text', namespaces=INKSVG_NAMESPACES)
     textext = doc.xpath(
         '//*[@textext:text]', namespaces=INKSVG_NAMESPACES)
-    (defs,) = doc.xpath(
-        '//svg:defs', namespaces=INKSVG_NAMESPACES)
     ignore_ids = set()
-    for u in defs.xpath('//svg:path', namespaces=INKSVG_NAMESPACES):
-        name = u.attrib['id']
-        ignore_ids.add(name)
+    for defs in doc.xpath(
+            '//svg:defs', namespaces=INKSVG_NAMESPACES):
+        for u in defs.xpath(
+                '//svg:path', namespaces=INKSVG_NAMESPACES):
+            name = u.attrib['id']
+            ignore_ids.add(name)
     # extract text and remove it from svg
     text_ids = set()
     labels = list()
