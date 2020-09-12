@@ -113,6 +113,7 @@ _BBox = collections.namedtuple('BBox', ['x', 'y', 'width', 'height'])
 
 
 def _parse_args():
+    """Return arguments parsed from the command line."""
     p = argparse.ArgumentParser()
     p.add_argument('fname', type=str, help='svg file name')
     args = p.parse_args()
@@ -120,6 +121,14 @@ def _parse_args():
 
 
 def convert(svg_fname):
+    """Convert SVG `svg_fname` to a PDF and a LaTeX file.
+
+    The PDF file includes graphics from the SVG `svg_fname`.
+    The LaTeX file includes text from the SVG `svg_fname`.
+    The LaTeX file has extension `.pdf_tex`.
+
+    @type svg_fname: `str`
+    """
     fname, ext = os.path.splitext(svg_fname)
     assert ext == '.svg', ext
     tex_path = '{fname}.pdf_tex'.format(fname=fname)
@@ -138,6 +147,10 @@ def convert(svg_fname):
 
 
 def _split_text_graphics(svg_fname):
+    """Return XML for graphics SVG and text labels.
+
+    @type svg_fname: `str`
+    """
     doc = etree.parse(svg_fname)
     _print_svg_units(doc)
     ignore_ids = set()
@@ -161,6 +174,10 @@ def _split_text_graphics(svg_fname):
 
 
 def _print_svg_units(doc):
+    """Print `doc` width and height in units.
+
+    @type doc: `lxml.etree._ElementTree`
+    """
     w = _mm_to_svg_units(doc.getroot().attrib['width'])
     h = _mm_to_svg_units(doc.getroot().attrib['height'])
     print('width = {w:0.2f} px, height = {h:0.2f} px'.format(
@@ -176,6 +193,10 @@ def _print_svg_units(doc):
 
 
 def _mm_to_svg_units(x):
+    """Return SVG units from `x`.
+
+    @param x: `str` that may contain `"mm"`
+    """
     if 'mm' in x:
         s = x[:-2]
         return float(s) / 25.4 * DPI
@@ -184,6 +205,13 @@ def _mm_to_svg_units(x):
 
 
 def _interpret_svg_text(text_element, labels):
+    """Return text IDs and augment `labels`.
+
+    @type text_element: `lxml.etree._Element`
+    @type labels: `list`
+    @return: text IDs
+    @rtype: `set`
+    """
     if 'style' in text_element.attrib:
         style = _split_svg_style(
             text_element.attrib['style'])
@@ -217,6 +245,7 @@ def _interpret_svg_text(text_element, labels):
 
 
 def _make_tex_label(tspan):
+    """Return a `_TeXLabel` from `tspan`."""
     # position and angle
     pos, angle = _get_tspan_pos_angle(tspan)
     tex_label = _TeXLabel(pos, '')
@@ -225,6 +254,7 @@ def _make_tex_label(tspan):
 
 
 def _get_tspan_pos_angle(tspan):
+    """Compute position and orientation of `tspan`."""
     xform = _compute_svg_transform(tspan)
     pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
     pos = xform.applyTo(pos)
@@ -233,6 +263,7 @@ def _get_tspan_pos_angle(tspan):
 
 
 def _update_tspan_style(style, tspan):
+    """Return style of `style` updated using `tspan`."""
     span_style = style.copy()
     if 'style' in tspan.attrib:
         st = _split_svg_style(tspan.attrib['style'])
@@ -241,12 +272,14 @@ def _update_tspan_style(style, tspan):
 
 
 def _set_fill(tex_label, span_style):
+    """Assign `tex_label.color` using `span_style`."""
     if 'fill' not in span_style:
         return
     tex_label.color = _parse_svg_color(span_style['fill'])
 
 
 def _set_font_weight(tex_label, span_style):
+    """Assign `tex_label.fontweight` using `span_style`."""
     if 'font-weight' not in span_style:
         return
     weight = span_style['font-weight']
@@ -259,6 +292,7 @@ def _set_font_weight(tex_label, span_style):
 
 
 def _set_font_style(tex_label, span_style):
+    """Assign `tex_label.fontstyle` using `span_style`."""
     if 'font-style' not in span_style:
         return
     fstyle = span_style['font-style']
@@ -271,6 +305,7 @@ def _set_font_style(tex_label, span_style):
 
 
 def _set_text_anchor(tex_label, span_style):
+    """Assign `tex_label.align` using `span_style`."""
     if 'text-anchor' not in span_style:
         return
     anchor = span_style['text-anchor']
@@ -283,6 +318,7 @@ def _set_text_anchor(tex_label, span_style):
 
 
 def _set_font_family(tex_label, span_style):
+    """Assign `tex_label.fontfamily` using `span_style`."""
     if 'font-family' not in span_style:
         return
     ff = span_style['font-family']
@@ -293,6 +329,7 @@ def _set_font_family(tex_label, span_style):
 
 
 def _set_font_size(tex_label, span_style):
+    """Assign `tex_label.fontsize` using `span_style`."""
     if 'font-size' not in span_style:
         return
     fs = span_style['font-size']
@@ -303,6 +340,7 @@ def _set_font_size(tex_label, span_style):
 
 
 def _split_svg_style(style):
+    """Return `dict` from parsing `style`."""
     parts = [x.strip() for x in style.split(';')]
     parts = [x.partition(':') for x in parts if x != '']
     st = dict()
@@ -312,6 +350,11 @@ def _split_svg_style(style):
 
 
 def _compute_svg_transform(el):
+    """Return transformation of element `el`.
+
+    @type el: `lxml.etree._Element`
+    @rtype: `_AffineTransform`
+    """
     xform = _AffineTransform()
     while el is not None:
         if 'transform' in el.attrib:
@@ -322,6 +365,11 @@ def _compute_svg_transform(el):
 
 
 def _parse_svg_transform(attribute):
+    """Return transformation from `attribute`.
+
+    @type attribute: `str`
+    @rtype: `_AffineTransform`
+    """
     m = _RX_TRANSFORM.match(attribute)
     assert m is not None, 'bad transform (' + attribute + ')'
     func = m.group(1)
@@ -341,6 +389,11 @@ def _parse_svg_transform(attribute):
 
 
 def _make_matrix_transform(args):
+    """Return matrix transformation from `args`.
+
+    @type args: `list` of `float`
+    @rtype: `_AffineTransform`
+    """
     assert len(args) == 6, args
     xform = _AffineTransform()
     xform.matrix(*args)
@@ -348,6 +401,11 @@ def _make_matrix_transform(args):
 
 
 def _make_translation_transform(args):
+    """Return translation from `args`.
+
+    @type args: `list` of `float`
+    @rtype: `_AffineTransform`
+    """
     assert len(args) in (1, 2), args
     tx = args[0]
     ty = args[1] if len(args) > 1 else 0.0
@@ -357,6 +415,11 @@ def _make_translation_transform(args):
 
 
 def _make_scaling_transform(args):
+    """Return scaling from `args`.
+
+    @type args: `list` of `float`
+    @rtype: `_AffineTransform`
+    """
     assert len(args) in (1, 2), args
     sx = args[0]
     sy = args[1] if len(args) > 1 else sx
@@ -366,6 +429,11 @@ def _make_scaling_transform(args):
 
 
 def _make_rotation_transform(args):
+    """Return rotation from `args`.
+
+    @type args: `list` of `float`
+    @rtype: `_AffineTransform`
+    """
     assert len(args) in (1, 3), args
     if len(args) == 1:
         args = args + [0, 0]  # cx, cy
@@ -376,6 +444,11 @@ def _make_rotation_transform(args):
 
 
 def _parse_svg_color(color):
+    """Return RGB integers from Inkscape color.
+
+    @type color: `str`
+    @rtype: `tuple` (triplet)
+    """
     if color[0] != '#':
         raise Exception('only hash-code colors are supported!')
     red = int(color[1:3], 16)
@@ -385,6 +458,16 @@ def _parse_svg_color(color):
 
 
 def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
+    """Export drawing area of SVG `svg_data` to PDF.
+
+    This functions uses `inkscape` for both the
+    conversion to PDF, and for computing bounding boxes.
+
+    @type svg_data: `lxml.etree._ElementTree`
+    @type pdfpath: `str`
+    @return: bounding boxes
+    @rtype: `dict`
+    """
     inkscape = which_inkscape()
     path = os.path.realpath(pdfpath)
     args = [inkscape,
@@ -416,6 +499,16 @@ def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
 
 
 def _generate_pdf_from_svg_using_cairo(svg_data, pdfpath):
+    """Export SVG `svg_data` to PDF.
+
+    This function uses `cairosvg` for the conversion to PDF,
+    and `inkscape` to compute the bounding boxes.
+
+    @type svg_data: `lxml.etree._ElementTree`
+    @type pdfpath: `str`
+    @return: bounding boxes
+    @rtype: `dict`
+    """
     with tempfile.NamedTemporaryFile(
             suffix='.svg', delete=True) as tmpsvg:
         svg_data.write(tmpsvg, encoding='utf-8',
@@ -430,7 +523,11 @@ def _generate_pdf_from_svg_using_cairo(svg_data, pdfpath):
 
 
 def _pdf_bounding_box(pdf_bboxes):
-    """Return PDF bounding box."""
+    """Return PDF bounding box.
+
+    @type pdf_bboxes: `dict`
+    @rtype: `_BBox`
+    """
     # Drawing area coordinates within SVG
     for k, d in pdf_bboxes.items():
         if k.startswith('svg'):
@@ -446,7 +543,14 @@ def _pdf_bounding_box(pdf_bboxes):
 
 def _svg_bounding_box(
         svg_bboxes, text_ids, ignore_ids, pdf_bbox):
-    """Return initial SVG bounding box."""
+    """Return initial SVG bounding box.
+
+    @type svg_bboxes: `dict`
+    @type text_ids: `set`
+    @type ignore_ids: `set`
+    @type pdf_bbox: `_BBox`
+    @rtype: `_BBox`
+    """
     xs = set()
     ys = set()
     # pprint.pprint(svg_bboxes)
@@ -479,7 +583,13 @@ def _svg_bounding_box(
 
 
 def _svg_bounding_boxes(svgfile):
-    """Parses the output from inkscape `--query-all`."""
+    """Parses the output from inkscape `--query-all`.
+
+    This function calls `inkscape`.
+
+    @type svgfile: `str`
+    @rtype: `dict`
+    """
     inkscape = which_inkscape()
     path = os.path.realpath(svgfile)
     args = [
@@ -523,7 +633,12 @@ def which_inkscape():
 
 
 def _parse_bbox_string(line):
-    """Return `x, y, w, h` from bounding box string."""
+    """Return `x, y, w, h` from bounding box string.
+
+    @type line: `str`
+    @return: quintuple
+    @rtype: `tuple`
+    """
     name, *rest = line.split(',')
     x, y, w, h = [float(x) for x in rest]
     return name, x, y, w, h
@@ -534,6 +649,8 @@ def _corners(d):
 
     @param d: `dict` with keys
         `'x', 'y', 'w', 'h'`
+    @return: quadruple
+    @rtype: `tuple`
     """
     x = d['x']
     y = d['y']
@@ -545,6 +662,7 @@ def _corners(d):
 
 
 class _AffineTransform(object):
+    """Affine transformation."""
 
     def __init__(self, t=None, m=None):
         self.t = (0.0, 0.0) if t is None else t
@@ -557,9 +675,11 @@ class _AffineTransform(object):
         return nt
 
     def translate(self, tx, ty):
+        """Create translation."""
         self.matrix(1.0, 0.0, 0.0, 1.0, tx, ty)
 
     def rotate_degrees(self, angle, cx=0.0, cy=0.0):
+        """Create rotation."""
         angle = math.radians(angle)
         sin, cos = math.sin(angle), math.cos(angle)
         if cx != 0.0 or cy != 0.0:
@@ -570,11 +690,13 @@ class _AffineTransform(object):
             self.matrix(cos, sin, -sin, cos, 0.0, 0.0)
 
     def scale(self, sx, sy=None):
+        """Create scaling."""
         if sy is None:
             sy = sx
         self.matrix(sx, 0.0, 0.0, sy)
 
     def matrix(self, a, b, c, d, e=0.0, f=0.0):
+        """Create matrix transformation."""
         sa, sb, sc, sd = self.m
         se, sf = self.t
 
@@ -588,6 +710,7 @@ class _AffineTransform(object):
         self.t = (me, mf)
 
     def applyTo(self, x, y=None):
+        """Transform position `x, y`."""
         if y is None:
             x, y = x
         xx = self.t[0] + self.m[0] * x + self.m[2] * y
@@ -595,11 +718,13 @@ class _AffineTransform(object):
         return (xx, yy)
 
     def __str__(self):
+        """Return `str` representation."""
         return '[{},{},{}  ;  {},{},{}]'.format(
             self.m[0], self.m[2], self.t[0],
             self.m[1], self.m[3], self.t[1])
 
     def __mul__(a, b):
+        """Compose transformations."""
         a11, a21, a12, a22 = a.m
         a13, a23 = a.t
         b11, b21, b12, b22 = b.m
@@ -615,6 +740,7 @@ class _AffineTransform(object):
         return _AffineTransform((c13, c23), (c11, c21, c12, c22))
 
     def get_rotation(self):
+        """Return angle in degrees."""
         m11, m21, m12, m22 = self.m
         len1 = math.sqrt(m11 * m11 + m21 * m21)
         len2 = math.sqrt(m12 * m12 + m22 * m22)
@@ -625,6 +751,7 @@ class _AffineTransform(object):
 
 
 class _TeXLabel(object):
+    """LaTeX label."""
 
     def __init__(self, pos, text):
         self.text = text
@@ -639,6 +766,7 @@ class _TeXLabel(object):
         self.scale = 1.0
 
     def texcode(self):
+        """Return LaTeX code."""
         color = self._color_tex()
         font = '\\' + self.fontfamily + 'family'
         font += self._font_weight_tex()
@@ -658,6 +786,7 @@ class _TeXLabel(object):
         return texcode
 
     def _color_tex(self):
+        """Return LaTeX code for text color."""
         r, g, b = self.color
         if r != 0 or g != 0 or b != 0:
             color = '\\color[RGB]{{{r},{g},{b}}}'.format(
@@ -667,12 +796,14 @@ class _TeXLabel(object):
         return color
 
     def _font_weight_tex(self):
+        """Return LaTeX code for text weight."""
         if self.fontweight >= _WEIGHT_BOLD:
             return r'\bfseries'
         else:
             return ''
 
     def _font_style_tex(self):
+        """Return LaTeX code for font style."""
         if self.fontstyle == _STYLE_ITALIC:
             return r'\itshape'
         elif self.fontstyle == _STYLE_OBLIQUE:
@@ -681,12 +812,14 @@ class _TeXLabel(object):
             return ''
 
     def _font_size_tex(self):
+        """Return LaTeX code for font size."""
         if self.fontsize is not None:
             return self.fontsize
         else:
             return ''
 
     def _alignment_tex(self):
+        """Return LaTeX code for text alignment."""
         if self.align == _ALIGN_LEFT:
             return r'\makebox(0,0)[bl]'
         elif self.align == _ALIGN_CENTER:
@@ -697,6 +830,7 @@ class _TeXLabel(object):
             raise ValueError(align)
 
     def _text(self):
+        """Return text."""
         if self.text is None:
             return ''
         else:
@@ -704,6 +838,7 @@ class _TeXLabel(object):
 
 
 class _TeXPicture(object):
+    """LaTeX `\picture` environment."""
 
     def __init__(
             self, svg_bbox, pdf_bbox,
@@ -716,6 +851,7 @@ class _TeXPicture(object):
         self.labels = labels
 
     def dumps(self):
+        """Return `str` representation."""
         unit = self.svg_bbox.width
         xmin = self.svg_bbox.x
         ymin = self.svg_bbox.y
@@ -762,10 +898,12 @@ class _TeXPicture(object):
         return s
 
     def add_label(self, label):
+        """Append a label."""
         self.labels.append(label)
 
 
 def _round(*args, unit=1):
+    """Return `args` normalized by `unit` and rounded."""
     return tuple(round(x / unit, 3) for x in args)
 
 
