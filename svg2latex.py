@@ -48,6 +48,7 @@ import sys
 import shutil
 import tempfile
 
+import cairosvg
 import lxml.etree as etree
 
 
@@ -572,6 +573,20 @@ def main():
 
 
 def generate_pdf_from_svg(svgData, pdfpath):
+    with tempfile.NamedTemporaryFile(
+            suffix='.svg', delete=True) as tmpsvg:
+        svgData.write(tmpsvg, encoding='utf-8',
+                      xml_declaration=True)
+        tmpsvg.flush()
+        bboxes = svg_bounding_boxes(tmpsvg.name)
+        shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
+        cairosvg.svg2pdf(
+            file_obj=tmpsvg,
+            write_to=pdfpath)
+    return bboxes
+
+
+def generate_pdf_from_svg_using_inkscape(svgData, pdfpath):
     args = ['/usr/bin/inkscape',
             '--without-gui',
             '--export-area-drawing',
