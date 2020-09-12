@@ -520,28 +520,6 @@ def process_svg(inpath):
     return doc, text_ids, ignore_ids, labels
 
 
-def generate_pdf_from_svg(svgData, pdfpath):
-    args = ['/usr/bin/inkscape',
-            '--without-gui',
-            '--export-area-drawing',
-            '--export-ignore-filters',
-            '--export-dpi={dpi}'.format(dpi=DPI),
-            '--export-pdf={path}'.format(path=pdfpath)]
-    with tempfile.NamedTemporaryFile(
-            suffix='.svg', delete=True) as tmpsvg:
-        svgData.write(tmpsvg, encoding='utf-8',
-                      xml_declaration=True)
-        tmpsvg.flush()
-        bboxes = svg_bounding_boxes(tmpsvg.name)
-        shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
-        args.append(tmpsvg.name)
-        with subprocess.Popen(args) as proc:
-            proc.wait()
-            if proc.returncode != 0:
-                sys.stderr.write('inkscape svg->pdf failed')
-    return bboxes
-
-
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('fname', type=str, help='svg file name')
@@ -590,6 +568,28 @@ def main():
     tex.backgroundGraphic = pdfpath
     with open(texpath, 'w', encoding='utf-8') as f:
         tex.emit_picture(f, xmax - xmin)
+
+
+def generate_pdf_from_svg(svgData, pdfpath):
+    args = ['/usr/bin/inkscape',
+            '--without-gui',
+            '--export-area-drawing',
+            '--export-ignore-filters',
+            '--export-dpi={dpi}'.format(dpi=DPI),
+            '--export-pdf={path}'.format(path=pdfpath)]
+    with tempfile.NamedTemporaryFile(
+            suffix='.svg', delete=True) as tmpsvg:
+        svgData.write(tmpsvg, encoding='utf-8',
+                      xml_declaration=True)
+        tmpsvg.flush()
+        bboxes = svg_bounding_boxes(tmpsvg.name)
+        shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
+        args.append(tmpsvg.name)
+        with subprocess.Popen(args) as proc:
+            proc.wait()
+            if proc.returncode != 0:
+                sys.stderr.write('inkscape svg->pdf failed')
+    return bboxes
 
 
 def corners(d):
