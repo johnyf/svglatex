@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Export SVG to PDF + LaTeX."""
 #
 # Based on:
 # https://github.com/johnbartholomew/svg2latex/blob/
@@ -37,7 +38,6 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-"""Export SVG to PDF + LaTeX."""
 import argparse
 import collections
 import math
