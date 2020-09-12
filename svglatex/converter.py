@@ -376,13 +376,12 @@ def _make_rotation_transform(args):
 
 
 def _parse_svg_color(color):
-    if color[0] == '#':
-        red = int(color[1:3], 16)
-        green = int(color[3:5], 16)
-        blue = int(color[5:7], 16)
-        return (red, green, blue)
-    else:
+    if color[0] != '#':
         raise Exception('only hash-code colors are supported!')
+    red = int(color[1:3], 16)
+    green = int(color[3:5], 16)
+    blue = int(color[5:7], 16)
+    return (red, green, blue)
 
 
 def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
