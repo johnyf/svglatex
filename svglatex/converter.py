@@ -140,8 +140,6 @@ def convert(svg_fname):
 def _split_text_graphics(svg_fname):
     doc = etree.parse(svg_fname)
     _print_svg_units(doc)
-    text = doc.xpath(
-        '//svg:text', namespaces=_INKSVG_NAMESPACES)
     ignore_ids = set()
     for defs in doc.xpath(
             '//svg:defs', namespaces=_INKSVG_NAMESPACES):
@@ -152,6 +150,8 @@ def _split_text_graphics(svg_fname):
     # extract text and remove it from svg
     text_ids = set()
     labels = list()
+    text = doc.xpath(
+        '//svg:text', namespaces=_INKSVG_NAMESPACES)
     for u in text:
         ids = _interpret_svg_text(u, labels)
         text_ids.update(ids)
