@@ -218,8 +218,9 @@ def _interpret_svg_text(text_element, labels):
     else:
         style = dict()
     text_ids = set()
-    name = text_element.attrib['id']
-    text_ids.add(name)
+    if 'id' in text_element.attrib:
+        name = text_element.attrib['id']
+        text_ids.add(name)
     all_text = list()
     xys = list()
     for tspan in text_element.xpath(
