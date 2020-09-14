@@ -223,8 +223,12 @@ def _interpret_svg_text(text_element, labels):
         text_ids.add(name)
     all_text = list()
     xys = list()
-    for tspan in text_element.xpath(
-            'svg:tspan', namespaces=_INKSVG_NAMESPACES):
+    # has `tspan` ?
+    tspans = text_element.xpath(
+        'svg:tspan', namespaces=_INKSVG_NAMESPACES)
+    if not tspans:
+        tspans = [text_element]
+    for tspan in tspans:
         all_text.append(tspan.text)
         tex_label = _make_tex_label(tspan)
         xys.append(tex_label.pos)
