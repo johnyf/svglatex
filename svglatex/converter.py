@@ -107,7 +107,7 @@ _INKSVG_NAMESPACES = {
                  r'DTD/sodipodi-0.dtd'),
     'inkscape': r'http://www.inkscape.org/namespaces/inkscape'}
 # transform re
-_RX_TRANSFORM = re.compile('^\s*(\w+)\(([0-9,\s\.-]*)\)\s*$')
+_RX_TRANSFORM = re.compile('^\s*(\w+)\(([0-9,\s\.-]*)\)\s*')
 # bounding box
 _BBox = collections.namedtuple('BBox', ['x', 'y', 'width', 'height'])
 
@@ -365,6 +365,15 @@ def _compute_svg_transform(el):
 
 
 def _parse_svg_transform(attribute):
+    t = _AffineTransform()
+    while attribute:
+        tx, end = _parse_single_svg_transform(attribute)
+        attribute = attribute[end:]
+        t = tx * t
+    return t
+
+
+def _parse_single_svg_transform(attribute):
     """Return transformation from `attribute`.
 
     @type attribute: `str`
@@ -378,17 +387,18 @@ def _parse_svg_transform(attribute):
     else:
         args = [float(x.strip()) for x in m.group(2).split(' ')]
     if func == 'matrix':
-        return _make_matrix_transform(args)
+        tform = _make_matrix_transform(args)
     elif func == 'translate':
-        return _make_translation_transform(args)
+        tform = _make_translation_transform(args)
     elif func == 'scale':
-        return _make_scaling_transform(args)
+        tform = _make_scaling_transform(args)
     elif func == 'rotate':
-        return _make_rotation_transform(args)
+        tform = _make_rotation_transform(args)
     else:
         raise Exception(
             'unsupported transform attribute ({a})'.format(
                 a=attribute))
+    return tform, m.end()
 
 
 def _make_matrix_transform(args):
