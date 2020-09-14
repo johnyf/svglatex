@@ -373,7 +373,10 @@ def _parse_svg_transform(attribute):
     m = _RX_TRANSFORM.match(attribute)
     assert m is not None, 'bad transform (' + attribute + ')'
     func = m.group(1)
-    args = [float(x.strip()) for x in m.group(2).split(',')]
+    if ',' in m.group(2):
+        args = [float(x.strip()) for x in m.group(2).split(',')]
+    else:
+        args = [float(x.strip()) for x in m.group(2).split(' ')]
     if func == 'matrix':
         return _make_matrix_transform(args)
     elif func == 'translate':
