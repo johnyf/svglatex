@@ -70,7 +70,10 @@ The style file `svglatex.sty` can be:
   `texhash $HOME/texmf` registers the style with LaTeX.
   You can find the appropriate location with
   `kpsewhich -var-value=TEXMFHOME`, as discussed [here](
-      http://tex.stackexchange.com/a/1138/8666). Alternatively,
+      http://tex.stackexchange.com/a/1138/8666).
+  To confirm the LaTeX package installation invoke
+  `kpsewhich svglatex.sty`
+  Alternatively,
 
 - placed in the LaTeX document directory, or
 
@@ -78,6 +81,8 @@ The style file `svglatex.sty` can be:
 
 For convenience, the file `svglatex.sty` is in the directory `tests/`.
 Examples of usage are in the test files `tests/*.tex`.
+See `svglatex.sty` for documentation, in particular it needs calling LaTeX
+with `--shell-escape`.
 
 
 # Tests
