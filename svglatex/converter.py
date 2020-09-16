@@ -156,9 +156,11 @@ def _split_text_graphics(svg_fname):
     _print_svg_units(doc)
     ignore_ids = set()
     for defs in doc.xpath(
-            '//svg:defs', namespaces=_INKSVG_NAMESPACES):
+            '//svg:defs',
+            namespaces=_INKSVG_NAMESPACES):
         for u in defs.xpath(
-                '//svg:path', namespaces=_INKSVG_NAMESPACES):
+                '//svg:path',
+                namespaces=_INKSVG_NAMESPACES):
             name = u.attrib['id']
             ignore_ids.add(name)
     # extract text and remove it from svg
@@ -166,7 +168,8 @@ def _split_text_graphics(svg_fname):
     labels = list()
     scaling = _scaling_assumed(doc)
     text = doc.xpath(
-        '//svg:text', namespaces=_INKSVG_NAMESPACES)
+        '//svg:text',
+        namespaces=_INKSVG_NAMESPACES)
     for u in text:
         ids = _interpret_svg_text(u, labels, scaling)
         text_ids.update(ids)
@@ -299,7 +302,8 @@ def _interpret_svg_text(text_element, labels, scaling):
     xys = list()
     # has `tspan` ?
     tspans = text_element.xpath(
-        'svg:tspan', namespaces=_INKSVG_NAMESPACES)
+        'svg:tspan',
+        namespaces=_INKSVG_NAMESPACES)
     if not tspans:
         tspans = [text_element]
     for tspan in tspans:
