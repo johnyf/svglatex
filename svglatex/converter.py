@@ -285,6 +285,7 @@ def _interpret_svg_text(text_element, labels, scaling):
     @return: text IDs
     @rtype: `set`
     """
+    assert text_element.tag.endswith('text'), text_element.tag
     if 'style' in text_element.attrib:
         style = _split_svg_style(
             text_element.attrib['style'])
