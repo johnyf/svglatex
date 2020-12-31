@@ -47,6 +47,7 @@ classifiers = [
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
     'Topic :: Multimedia :: Graphics :: Graphics Conversion',
     'Topic :: Scientific/Engineering :: Visualization',
     'Topic :: Text Processing :: Markup :: LaTeX',
