@@ -1,6 +1,6 @@
-The script `inkscape2tex.py` is known to work with:
-
-- `inkscape == 0.92.2`
+The package `svglatex` is known to work with `inkscape == 0.92.2`.
+The DPI setting in the package `svglatex` corresponds to `inkscape >= 0.92.0`,
+when the DPI setting of `inkscape` changed.
 
 
 ## Practical hints

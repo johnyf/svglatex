@@ -23,6 +23,9 @@ SVGLaTeX converts the SVG only if the PDF file is older than the SVG source.
 - [Inkscape](https://en.wikipedia.org/wiki/Inkscape): needs to be installed and
   the executable `inkscape` in the environment variable
   [`$PATH`](https://en.wikipedia.org/wiki/PATH_(variable)).
+  The DPI setting in the package `svglatex` corresponds to
+  [Inkscape version 0.92.0](https://inkscape.org/release/inkscape-0.92/)
+  and higher.
 
   On Linux you can install `inkscape` using the operating system's package
   manager, for example `apt install inkscape` on [Debian](
