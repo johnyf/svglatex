@@ -64,8 +64,8 @@ def parse_args():
             'Export to this file type. '
             'The prefix "latex" produces also a file `*.pdf_tex` '
             'that contains the text from the SVG. '
-            'The command `\includesvgpdf` passes `pdf`, '
-            'and `\includesvg` passes `latex-pdf`.'))
+            r'The command `\includesvgpdf` passes `pdf`, '
+            r'and `\includesvg` passes `latex-pdf`.'))
     args = parser.parse_args()
     return args
 
