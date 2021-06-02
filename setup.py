@@ -103,6 +103,7 @@ def run_setup():
         author_email='jfilippidis@gmail.com',
         url=url,
         license='BSD',
+        python_requires='>=3.5',
         install_requires=install_requires,
         tests_require=tests_require,
         packages=[name],
