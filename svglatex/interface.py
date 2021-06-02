@@ -147,7 +147,7 @@ def convert_svg(svg, out, out_type):
 def convert_svg_using_inkscape(svg, out, out_type):
     """Convert from SVG to output format."""
     # inkscape need be called with an absolute path on OS X
-    # http://wiki.inkscape.org/wiki/index.php/MacOS_X
+    # https://wiki.inkscape.org/wiki/index.php/MacOS_X
     symlink_relpath = 'bin/inkscape'
     home = os.path.expanduser('~')
     symlink_abspath = os.path.join(home, symlink_relpath)

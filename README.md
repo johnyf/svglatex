@@ -65,7 +65,7 @@ svglatex -h
 
 For including SVG files in a LaTeX document, install the Python package `svglatex`
 and the LaTeX style [`svglatex.sty`](
-    https://github.com/johnyf/latex_packages/blob/master/svglatex.sty),
+    https://github.com/johnyf/latex_packages/blob/main/svglatex.sty),
 which includes the LaTeX commands `\includesvg` and `\includesvgpdf`.
 The style file `svglatex.sty` can be:
 
@@ -73,7 +73,7 @@ The style file `svglatex.sty` can be:
   `texhash $HOME/texmf` registers the style with LaTeX.
   You can find the appropriate location with
   `kpsewhich -var-value=TEXMFHOME`, as discussed [here](
-      http://tex.stackexchange.com/a/1138/8666).
+      https://tex.stackexchange.com/a/1138/8666).
   To confirm the LaTeX package installation invoke
   `kpsewhich svglatex.sty`
   Alternatively,
@@ -95,4 +95,4 @@ See the file `tests/README.md`.
 
 # License
 
-[BSD-3](http://opensource.org/licenses/BSD-3-Clause), see file `LICENSE`.
+[BSD-3](https://opensource.org/licenses/BSD-3-Clause), see file `LICENSE`.

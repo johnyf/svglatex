@@ -5,7 +5,7 @@ The tests require:
 - the Python package `svglatex`
 - [XeLaTeX](https://en.wikipedia.org/wiki/XeTeX)
 - [Inkscape](https://en.wikipedia.org/wiki/Inkscape)
-- [`svglatex.sty`](https://github.com/johnyf/latex_packages/blob/master/svglatex.sty):
+- [`svglatex.sty`](https://github.com/johnyf/latex_packages/blob/main/svglatex.sty):
   for convenience, the LaTeX style file `svglatex.sty` is included under the
   directory `tests/`.
 
