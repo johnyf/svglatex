@@ -19,6 +19,8 @@ long_description = (
     'More details can be found in the README at: '
     'https://github.com/johnyf/svglatex')
 url = 'https://github.com/johnyf/{name}'.format(name=name)
+PROJECT_URLS = {
+    'Bug Tracker': 'https://github.com/johnyf/svglatex/issues'}
 VERSION_FILE = '{name}/_version.py'.format(name=name)
 MAJOR = 0
 MINOR = 0
@@ -102,6 +104,7 @@ def run_setup():
         author='Ioannis Filippidis',
         author_email='jfilippidis@gmail.com',
         url=url,
+        project_urls=PROJECT_URLS,
         license='BSD',
         python_requires='>=3.5',
         install_requires=install_requires,
