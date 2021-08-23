@@ -72,7 +72,8 @@ def parse_args():
 def convert_if_svg_newer(svg, out_type):
     """Convert SVG file to PDF or EPS."""
     base, ext = os.path.splitext(svg)
-    assert ext == '.svg', ext
+    if ext != '.svg':
+        raise ValueError(ext)
     if 'pdf' in out_type:
         out = base + '.pdf'
     elif 'eps' in out_type:
@@ -95,7 +96,8 @@ def convert_if_svg_newer(svg, out_type):
 
 def is_newer(target, source):
     """Return `True` if `target` newer than `source` file."""
-    assert os.path.isfile(source), source
+    if not os.path.isfile(source):
+        raise ValueError(source)
     if not os.path.isfile(target):
         return False
     t_src = os.stat(source)[8]
@@ -121,7 +123,8 @@ def _format_time(t):
 
 def convert_svg(svg, out, out_type):
     """Convert from SVG to output format."""
-    assert out_type in ('latex-pdf', 'pdf'), out_type
+    if out_type not in ('latex-pdf', 'pdf'):
+        raise ValueError(out_type)
     if out_type == 'latex-pdf':
         converter.convert(svg)
     elif out_type == 'pdf':

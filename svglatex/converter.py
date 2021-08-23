@@ -131,7 +131,8 @@ def convert(svg_fname):
     @type svg_fname: `str`
     """
     fname, ext = os.path.splitext(svg_fname)
-    assert ext == '.svg', ext
+    if ext != '.svg':
+        raise ValueError(ext)
     tex_path = f'{fname}.pdf_tex'
     pdf_path = f'{fname}.pdf'
     # convert
@@ -285,7 +286,8 @@ def _interpret_svg_text(text_element, labels, scaling):
     @return: text IDs
     @rtype: `set`
     """
-    assert text_element.tag.endswith('text'), text_element.tag
+    if not text_element.tag.endswith('text'):
+        raise ValueError(text_element.tag)
     if 'style' in text_element.attrib:
         style = _split_svg_style(
             text_element.attrib['style'])
@@ -468,7 +470,8 @@ def _parse_single_svg_transform(attribute):
     @rtype: `_AffineTransform`
     """
     m = _RX_TRANSFORM.match(attribute)
-    assert m is not None, 'bad transform (' + attribute + ')'
+    if m is None:
+        raise RuntimeError(f'bad transform ({attribute})')
     func = m.group(1)
     if ',' in m.group(2):
         args = [float(x.strip()) for x in m.group(2).split(',')]
@@ -494,7 +497,8 @@ def _make_matrix_transform(args):
     @type args: `list` of `float`
     @rtype: `_AffineTransform`
     """
-    assert len(args) == 6, args
+    if len(args) != 6:
+        raise ValueError(args)
     xform = _AffineTransform()
     xform.matrix(*args)
     return xform
@@ -506,7 +510,8 @@ def _make_translation_transform(args):
     @type args: `list` of `float`
     @rtype: `_AffineTransform`
     """
-    assert len(args) in (1, 2), args
+    if len(args) not in (1, 2):
+        raise ValueError(args)
     tx = args[0]
     ty = args[1] if len(args) > 1 else 0.0
     xform = _AffineTransform()
@@ -520,7 +525,8 @@ def _make_scaling_transform(args):
     @type args: `list` of `float`
     @rtype: `_AffineTransform`
     """
-    assert len(args) in (1, 2), args
+    if len(args) not in (1, 2):
+        raise ValueError(args)
     sx = args[0]
     sy = args[1] if len(args) > 1 else sx
     xform = _AffineTransform()
@@ -534,7 +540,8 @@ def _make_rotation_transform(args):
     @type args: `list` of `float`
     @rtype: `_AffineTransform`
     """
-    assert len(args) in (1, 3), args
+    if len(args) not in (1, 3):
+        raise ValueError(args)
     if len(args) == 1:
         args = args + [0, 0]  # cx, cy
     xform = _AffineTransform()
@@ -701,7 +708,7 @@ def _svg_bounding_boxes(svgfile):
         lines = proc.stdout.readlines()
         proc.wait()
         if proc.returncode != 0:
-            raise Exception((
+            raise Exception(
                 f'`{inkscape}` exited with '
                 f'return code {proc.returncode}')
     bboxes = dict()
@@ -971,7 +978,8 @@ class _TeXPicture:
             s = f'\\put({x}, {y}){{{text}}}%'
             c.append(s)
         width, height = _round(w, h, unit=unit)
-        assert width == 1, width
+        if width != 1:
+            raise ValueError(width)
         s = (
             '\\begingroup%\n' +
             _PICTURE_PREAMBLE +
