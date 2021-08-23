@@ -5,10 +5,10 @@
 - DOT to SVG
 
 Skips conversion if PDF file found newer than SVG source.
-Requires `inkscape` in path.
+Requires `inkscape` in the runtime environment's PATH.
 """
 # Copyright 2010-2017 by Ioannis Filippidis
-# All rights reserved. Licensed under BSD-2.
+# All rights reserved. Licensed under 2-clause BSD.
 #
 import argparse
 import datetime

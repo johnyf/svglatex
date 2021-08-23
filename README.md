@@ -20,8 +20,8 @@ SVGLaTeX converts the SVG only if the PDF file is older than the SVG source.
 
 # Requirements
 
-- [Inkscape](https://en.wikipedia.org/wiki/Inkscape): needs to be installed and
-  the executable `inkscape` in the environment variable
+- [Inkscape](https://en.wikipedia.org/wiki/Inkscape): needs to
+  be installed and the executable `inkscape` in the environment variable
   [`$PATH`](https://en.wikipedia.org/wiki/PATH_(variable)).
   The DPI setting in the package `svglatex` corresponds to
   [Inkscape version 0.92.0](https://inkscape.org/release/inkscape-0.92/)
@@ -35,12 +35,17 @@ SVGLaTeX converts the SVG only if the PDF file is older than the SVG source.
   as follows:
 
   ```shell
-  ln -s $HOME/Applications/Inkscape.app/Contents/Resources/bin/inkscape $HOME/bin/inkscape
-  ln -s $HOME/Applications/Inkscape.app/Contents/Resources/bin/inkscape-bin $HOME/bin/inkscape-bin
+  ln -s \
+      $HOME/Applications/Inkscape.app/Contents/Resources/bin/inkscape \
+      $HOME/bin/inkscape
+  ln -s \
+      $HOME/Applications/Inkscape.app/Contents/Resources/bin/inkscape-bin \
+      $HOME/bin/inkscape-bin
   ```
 
   This assumes that the file `Inkscape.app` is installed in the directory
-  `/$HOME/Applications/`. The environment variable `$HOME` is described [here](
+  `/$HOME/Applications/`.
+  The environment variable `$HOME` is described [here](
       https://en.wikipedia.org/wiki/Environment_variable#Examples).
 
 
@@ -63,7 +68,8 @@ svglatex -h
 
 # Usage
 
-For including SVG files in a LaTeX document, install the Python package `svglatex`
+For including SVG files in a LaTeX document,
+install the Python package `svglatex`
 and the LaTeX style [`svglatex.sty`](
     https://github.com/johnyf/latex_packages/blob/main/svglatex.sty),
 which includes the LaTeX commands `\includesvg` and `\includesvgpdf`.
@@ -80,7 +86,8 @@ The style file `svglatex.sty` can be:
 
 - placed in the LaTeX document directory, or
 
-- the contents of `svglatex.sty` can be copied to the LaTeX document's preamble.
+- the contents of `svglatex.sty` can be copied to
+  the LaTeX document's preamble.
 
 For convenience, the file `svglatex.sty` is in the directory `tests/`.
 Examples of usage are in the test files `tests/*.tex`.
