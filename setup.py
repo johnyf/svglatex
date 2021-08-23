@@ -58,8 +58,8 @@ def git_version(version):
     # assert versions are increasing
     latest_tag = repo.git.describe(
         match='v[0-9]*', tags=True, abbrev=0)
-    assert parse_version(latest_tag) <= parse_version(version), (
-        latest_tag, version)
+    if parse_version(latest_tag) > parse_version(version):
+        raise ValueError((latest_tag, version))
     sha = repo.head.commit.hexsha
     if repo.is_dirty():
         return f'{version}.dev0+{sha}.dirty'
@@ -71,7 +71,8 @@ def git_version(version):
             tags=True, dirty=True)
     except git.GitCommandError:
         return f'{version}.dev0+{sha}'
-    assert tag == 'v' + version, (tag, version)
+    if tag != 'v' + version:
+        raise ValueError((tag, version))
     return version
 
 
@@ -80,7 +81,7 @@ def run_setup():
     # version
     try:
         version = git_version(VERSION)
-    except AssertionError:
+    except ValueError:
         raise
     except:
         print('No git info: Assume release.')
