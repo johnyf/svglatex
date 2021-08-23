@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 def main():
     """Start from here."""
     args = parse_args()
-    f = '{name}.svg'.format(name=args.input_file)
+    f = f'{args.input_file}.svg'
     out_type = args.method
     if './img/' in f:
         files = [f]
@@ -38,13 +38,12 @@ def main():
         files = locate(f, './img')
     svg = None
     for svg in files:
-        log.info('Will convert SVG file "{f}" to {t}'.format(
-            f=svg, t=out_type))
+        log.info(f'Will convert SVG file "{svg}" to {out_type}')
         convert_if_svg_newer(svg, out_type)
     if svg is None:
         raise Exception(
-            'SVG file "{f}" not found! '
-            'Cannot export to PDF.'.format(f=f))
+            f'SVG file "{f}" not found! '
+            'Cannot export to PDF.')
 
 
 def parse_args():
@@ -82,7 +81,7 @@ def convert_if_svg_newer(svg, out_type):
         raise ValueError(out_type)
     if not os.access(svg, os.F_OK):
         raise FileNotFoundError(
-            'No SVG file "{f}"'.format(f=svg))
+            f'No SVG file "{svg}"')
     fresh = is_newer(out, svg)
     if out_type == 'latex-pdf':
         pdf_tex = base + '.pdf_tex'
@@ -108,12 +107,10 @@ def is_newer(target, source):
 def _print_dates(source, target, t_src, t_tgt):
     s = _format_time(t_src)
     t = _format_time(t_tgt)
-    log.info((
+    log.info(
         'last modification dates:\n'
-        '    Source ({source}): {s}\n'
-        '    Target ({target}): {t}').format(
-            source=source, target=target,
-            s=s, t=t))
+        f'    Source ({source}): {s}\n'
+        f'    Target ({target}): {t}')
 
 
 def _format_time(t):
@@ -131,13 +128,14 @@ def convert_svg(svg, out, out_type):
         inkscape = converter.which_inkscape()
         svg_path = os.path.realpath(svg)
         out_path = os.path.realpath(out)
+        dpi = 96
         args = [
             inkscape,
             '--without-gui',
             '--export-area-drawing',
             '--export-ignore-filters',
-            '--export-dpi={dpi}'.format(dpi=96),
-            '--export-pdf={out}'.format(out=out_path),
+            f'--export-dpi={dpi}',
+            f'--export-pdf={out_path}',
             svg_path]
         r = subprocess.call(args)
         if r != 0:
@@ -153,20 +151,18 @@ def convert_svg_using_inkscape(svg, out, out_type):
     symlink_abspath = os.path.join(home, symlink_relpath)
     inkscape_abspath = os.path.realpath(symlink_abspath)
     svg_abspath = os.path.realpath(svg)
-    args = ['{inkscape_abspath} -z -D --file={svg}'.format(
-        inkscape_abspath=inkscape_abspath, svg=svg_abspath)]
+    args = [f'{inkscape_abspath} -z -D --file={svg_abspath}']
     if 'pdf' in out_type:
-        args.append('--export-pdf={pdf}'.format(pdf=out))
+        args.append(f'--export-pdf={out}')
     if 'eps' in out_type:
-        args.append('--export-eps={eps}'.format(eps=out))
+        args.append(f'--export-eps={out}')
     if 'latex' in out_type:
         args.append('--export-latex')
     args = shlex.split(' '.join(args))
     r = subprocess.call(args)
     if r != 0:
         raise Exception(
-            'conversion from "{svg}" to "{out}" failed'.format(
-                svg=svg, out=out))
+            f'conversion from "{svg}" to "{out}" failed')
 
 
 def locate(pattern, root=os.curdir):
