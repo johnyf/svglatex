@@ -18,15 +18,14 @@ long_description = (
     'on the PDF.'
     'More details can be found in the README at: '
     'https://github.com/johnyf/svglatex')
-url = 'https://github.com/johnyf/{name}'.format(name=name)
+url = f'https://github.com/johnyf/{name}'
 PROJECT_URLS = {
     'Bug Tracker': 'https://github.com/johnyf/svglatex/issues'}
-VERSION_FILE = '{name}/_version.py'.format(name=name)
+VERSION_FILE = f'{name}/_version.py'
 MAJOR = 0
 MINOR = 0
 MICRO = 3
-VERSION = '{major}.{minor}.{micro}'.format(
-    major=MAJOR, minor=MINOR, micro=MICRO)
+VERSION = f'{MAJOR}.{MINOR}.{MICRO}'
 VERSION_TEXT = (
     '# This file was generated from setup.py\n'
     "version = '{version}'\n")
@@ -65,8 +64,7 @@ def git_version(version):
         latest_tag, version)
     sha = repo.head.commit.hexsha
     if repo.is_dirty():
-        return '{v}.dev0+{sha}.dirty'.format(
-            v=version, sha=sha)
+        return f'{version}.dev0+{sha}.dirty'
     # commit is clean
     # is it release of `version` ?
     try:
@@ -74,8 +72,7 @@ def git_version(version):
             match='v[0-9]*', exact_match=True,
             tags=True, dirty=True)
     except git.GitCommandError:
-        return '{v}.dev0+{sha}'.format(
-            v=version, sha=sha)
+        return f'{version}.dev0+{sha}'
     assert tag == 'v' + version, (tag, version)
     return version
 

@@ -132,8 +132,8 @@ def convert(svg_fname):
     """
     fname, ext = os.path.splitext(svg_fname)
     assert ext == '.svg', ext
-    tex_path = '{fname}.pdf_tex'.format(fname=fname)
-    pdf_path = '{fname}.pdf'.format(fname=fname)
+    tex_path = f'{fname}.pdf_tex'
+    pdf_path = f'{fname}.pdf'
     # convert
     xml, text_ids, ignore_ids, labels = _split_text_graphics(svg_fname)
     pdf_bboxes = _generate_pdf_from_svg_using_inkscape(xml, pdf_path)
@@ -185,16 +185,13 @@ def _print_svg_units(doc):
     """
     w = _mm_to_svg_units(doc.getroot().attrib['width'])
     h = _mm_to_svg_units(doc.getroot().attrib['height'])
-    print('width = {w:0.2f} px, height = {h:0.2f} px'.format(
-        w=w, h=h))
+    print(f'width = {w:0.2f} px, height = {h:0.2f} px')
     w_inch = w / DPI
     h_inch = h / DPI
-    print('width = {w:0.2f} in, height = {h:0.2f} in'.format(
-        w=w_inch, h=h_inch))
+    print(f'width = {w_inch:0.2f} in, height = {h_inch:0.2f} in')
     w_bp = w * SVG_UNITS_TO_BIG_POINTS
     h_bp = h * SVG_UNITS_TO_BIG_POINTS
-    print('width = {w:0.2f} bp, height = {h:0.2f} bp'.format(
-        w=w_bp, h=h_bp))
+    print(f'width = {w_bp:0.2f} bp, height = {h_bp:0.2f} bp')
 
 
 def _mm_to_svg_units(x):
@@ -487,8 +484,7 @@ def _parse_single_svg_transform(attribute):
         tform = _make_rotation_transform(args)
     else:
         raise Exception(
-            'unsupported transform attribute ({a})'.format(
-                a=attribute))
+            f'unsupported transform attribute ({attribute})')
     return tform, m.end()
 
 
@@ -578,8 +574,8 @@ def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
             '--without-gui',
             '--export-area-drawing',
             '--export-ignore-filters',
-            '--export-dpi={dpi}'.format(dpi=DPI),
-            '--export-pdf={path}'.format(path=path)]
+            f'--export-dpi={DPI}',
+            f'--export-pdf={path}']
     with tempfile.NamedTemporaryFile(
             suffix='.svg', delete=True) as tmpsvg:
         svg_data.write(tmpsvg, encoding='utf-8',
@@ -588,17 +584,14 @@ def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
         bboxes = _svg_bounding_boxes(tmpsvg.name)
         # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
         tmp_path = os.path.realpath(tmpsvg.name)
-        args.append('--file={s}'.format(s=tmp_path))
+        args.append(f'--file={tmp_path}')
         with subprocess.Popen(args) as proc:
             proc.wait()
             if proc.returncode != 0:
-                raise Exception((
-                    '`{inkscape}` conversion of SVG '
+                raise Exception(
+                    f'`{inkscape}` conversion of SVG '
                     'to PDF failed with return code '
-                    '{rcode}'
-                    ).format(
-                        inkscape=inkscape,
-                        rcode=proc.returncode))
+                    f'{proc.returncode}')
     return bboxes
 
 
@@ -700,7 +693,7 @@ def _svg_bounding_boxes(svgfile):
         inkscape,
         '--without-gui',
         '--query-all',
-        '--file={s}'.format(s=path)]
+        f'--file={path}']
     with subprocess.Popen(
             args,
             stdout=subprocess.PIPE,
@@ -709,11 +702,8 @@ def _svg_bounding_boxes(svgfile):
         proc.wait()
         if proc.returncode != 0:
             raise Exception((
-                '`{inkscape}` exited with '
-                'return code {rcode}'
-                ).format(
-                    inkscape=inkscape,
-                    rcode=proc.returncode))
+                f'`{inkscape}` exited with '
+                f'return code {proc.returncode}')
     bboxes = dict()
     for line in lines:
         name, x, y, w, h = _parse_bbox_string(line)
@@ -823,9 +813,9 @@ class _AffineTransform(object):
 
     def __str__(self):
         """Return `str` representation."""
-        return '[{},{},{}  ;  {},{},{}]'.format(
-            self.m[0], self.m[2], self.t[0],
-            self.m[1], self.m[3], self.t[1])
+        return '[{a},{b},{c}  ;  {d},{e},{f}]'.format(
+            a=self.m[0], b=self.m[2], c=self.t[0],
+            d=self.m[1], e=self.m[3], f=self.t[1])
 
     def __mul__(a, b):
         """Compose transformations."""
@@ -883,18 +873,14 @@ class _TeXLabel(object):
             r'{\smash{' + text + '}}')
         if self.angle != 0.0:
             texcode = (
-                '\\rotatebox{{{angle}}}{{{texcode}}}'
-                ).format(
-                    angle=self.angle,
-                    texcode=texcode)
+                f'\\rotatebox{{{self.angle}}}{{{texcode}}}')
         return texcode
 
     def _color_tex(self):
         """Return LaTeX code for text color."""
         r, g, b = self.color
         if r != 0 or g != 0 or b != 0:
-            color = '\\color[RGB]{{{r},{g},{b}}}'.format(
-                r=r, g=g, b=b)
+            color = f'\\color[RGB]{{{r},{g},{b}}}'
         else:
             color = ''
         return color
@@ -969,13 +955,11 @@ class _TeXPicture(object):
             y = (h + ymin) - (self.pdf_bbox.height + self.pdf_bbox.y)
             x, y = _round(x, y, unit=unit)
             scale = self.pdf_bbox.width / unit
+            img = self.background_graphics
             s = (
-                '\\put({x}, {y}){{'
-                '\\includegraphics[width={scale}\\unitlength]{{{img}}}'
-                '}}%').format(
-                    scale=scale,
-                    x=x, y=y,
-                    img=self.background_graphics)
+                f'\\put({x}, {y}){{'
+                f'\\includegraphics[width={scale}\\unitlength]{{{img}}}'
+                f'}}%')
             c.append(s)
         for label in self.labels:
             x, y = label.pos
@@ -983,19 +967,16 @@ class _TeXPicture(object):
             x = x - xmin
             y = (h + ymin) - y
             x, y = _round(x, y, unit=unit)
-            s = '\\put({x}, {y}){{{text}}}%'.format(
-                x=x, y=y,
-                text=label.texcode())
+            text = label.texcode()
+            s = f'\\put({x}, {y}){{{text}}}%'
             c.append(s)
         width, height = _round(w, h, unit=unit)
         assert width == 1, width
         s = (
             '\\begingroup%\n' +
             _PICTURE_PREAMBLE +
-            ('\\begin{{picture}}'
-             '({width}, {height})%\n').format(
-                width=width,
-                height=height) +
+            '\\begin{picture}' +
+            f'({width}, {height})%\n' +
             '\n'.join(c) + '\n' +
             '\\end{picture}%\n'
             '\\endgroup%\n')
