@@ -1,0 +1,48 @@
+---
+# configuration for GitHub Actions
+name: svglatex tests
+on:
+    push:
+    pull_request:
+    schedule:
+        - cron: '37 5 4 * *'
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-20.04
+        strategy:
+            matrix:
+                python-version: [
+                    '3.8',
+                    '3.9',
+                    ]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install APT packages
+              run: |
+                sudo apt update
+                sudo apt install \
+                    inkscape \
+                    texlive \
+                    texlive-xetex
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+            - name: Install dependencies from PyPI
+              run: |
+                pip install --upgrade pip setuptools
+            - name: Create sdist for `svglatex`
+              run: |
+                python setup.py sdist
+            - name: Install from sdist of `svglatex`
+              run: |
+                pip install dist/svglatex-*.tar.gz
+            - name: Run tests
+              run: |
+                set -o posix
+                echo "Exported environment variables:"
+                export -p
+                cd tests/
+                python -c 'import svglatex'
+                make all

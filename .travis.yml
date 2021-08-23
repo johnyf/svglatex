@@ -1,3 +1,9 @@
+# travis-ci.com is currently not used,
+# and this file may be outdated.
+#
+# GitHub Actions are used: configured via
+# the files in the directory:
+# `.github/workflows/`
 git:
   depth: 3
 
