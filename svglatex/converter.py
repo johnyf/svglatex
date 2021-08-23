@@ -755,7 +755,7 @@ def _corners(d):
     return x, xmax, y, ymax
 
 
-class _AffineTransform(object):
+class _AffineTransform:
     """Affine transformation."""
 
     def __init__(self, t=None, m=None):
@@ -844,7 +844,7 @@ class _AffineTransform(object):
         return math.degrees(math.atan2(m21, m11))
 
 
-class _TeXLabel(object):
+class _TeXLabel:
     """LaTeX label."""
 
     def __init__(self, pos, text):
@@ -927,7 +927,7 @@ class _TeXLabel(object):
             return self.text
 
 
-class _TeXPicture(object):
+class _TeXPicture:
     r"""LaTeX `\picture` environment."""
 
     def __init__(
