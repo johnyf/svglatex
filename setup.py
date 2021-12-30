@@ -6,10 +6,10 @@ from pkg_resources import parse_version
 # import git
 
 
-name = 'svglatex'
-description = (
+NAME = 'svglatex'
+DESCRIPTION = (
     'Include Inkscape graphics in LaTeX.')
-long_description = (
+LONG_DESCRIPTION = (
     'svglatex is a package for including SVG graphics in LaTeX documents '
     'via Inkscape. A script converts an SVG file to a PDF file that '
     'contains only graphics, and a text file that includes LaTeX code '
@@ -18,10 +18,10 @@ long_description = (
     'on the PDF.'
     'More details can be found in the README at: '
     'https://github.com/johnyf/svglatex')
-url = f'https://github.com/johnyf/{name}'
+url = f'https://github.com/johnyf/{NAME}'
 PROJECT_URLS = {
     'Bug Tracker': 'https://github.com/johnyf/svglatex/issues'}
-VERSION_FILE = f'{name}/_version.py'
+VERSION_FILE = f'{NAME}/_version.py'
 MAJOR = 0
 MINOR = 0
 MICRO = 3
@@ -30,13 +30,13 @@ VERSION_TEXT = (
     '# This file was generated from setup.py\n'
     "version = '{version}'\n")
 
-install_requires = [
+INSTALL_REQUIRES = [
     'humanize >= 2.6.0',
     'lxml >= 3.7.2',
     ]
-tests_require = [
+TESTS_REQUIRE = [
     ]
-classifiers = [
+CLASSIFIERS = [
     'Development Status :: 2 - Pre-Alpha',
     'Intended Audience :: Developers',
     'Intended Audience :: End Users/Desktop',
@@ -90,24 +90,24 @@ def run_setup():
     with open(VERSION_FILE, 'w') as f:
         f.write(s)
     setup(
-        name=name,
+        name=NAME,
         version=version,
-        description=description,
-        long_description=long_description,
+        description=DESCRIPTION,
+        long_description=LONG_DESCRIPTION,
         author='Ioannis Filippidis',
         author_email='jfilippidis@gmail.com',
         url=url,
         project_urls=PROJECT_URLS,
         license='BSD',
         python_requires='>=3.8',
-        install_requires=install_requires,
-        tests_require=tests_require,
-        packages=[name],
-        package_dir={name: name},
+        install_requires=INSTALL_REQUIRES,
+        tests_require=TESTS_REQUIRE,
+        packages=[NAME],
+        package_dir={NAME: NAME},
         include_package_data=True,
         entry_points={
             'console_scripts': ['svglatex = svglatex.interface:main']},
-        classifiers=classifiers,
+        classifiers=CLASSIFIERS,
         keywords=[
             'svg', 'latex', 'pdf', 'inkscape',
             'figure', 'graphics'])
