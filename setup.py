@@ -45,8 +45,6 @@ classifiers = [
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 3 :: Only',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
     'Topic :: Multimedia :: Graphics :: Graphics Conversion',
     'Topic :: Scientific/Engineering :: Visualization',
     'Topic :: Text Processing :: Markup :: LaTeX',
