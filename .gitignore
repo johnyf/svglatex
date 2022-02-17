@@ -1,4 +1,4 @@
-svglatex/_version.py
+/svglatex/_version.py
 __pycache__
 *.pyc
 *.whl
@@ -9,6 +9,6 @@ __pycache__
 *.aux
 *.out
 *.tar.gz
-dist/*
-build/*
+/dist/*
+/build/*
 *.egg-info
