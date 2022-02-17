@@ -38,7 +38,9 @@ def main():
         files = locate(f, './img')
     svg = None
     for svg in files:
-        log.info(f'Will convert SVG file "{svg}" to {out_type}')
+        log.info(
+            'Will convert SVG file '
+            f'"{svg}" to {out_type}')
         convert_if_svg_newer(svg, out_type)
     if svg is None:
         raise Exception(
@@ -66,7 +68,8 @@ def parse_args():
         choices=choices,
         help=(
             'Export to this file type. '
-            'The prefix "latex" produces also a file `*.pdf_tex` '
+            'The prefix "latex" produces also '
+            'a file `*.pdf_tex` '
             'that contains the text from the SVG. '
             r'The command `\includesvgpdf` passes `pdf`, '
             r'and `\includesvg` passes `latex-pdf`.'))
@@ -93,9 +96,13 @@ def convert_if_svg_newer(svg, out_type):
         pdf_tex = f'{base}.pdf_tex'
         fresh &= is_newer(pdf_tex, svg)
     if fresh:
-        log.info('No update needed, target newer than SVG.')
+        log.info(
+            'No update needed, '
+            'target newer than SVG.')
         return
-    log.info('File not found or old. Converting from SVG...')
+    log.info(
+        'File not found or old. '
+        'Converting from SVG...')
     convert_svg(svg, out, out_type)
 
 
@@ -176,7 +183,8 @@ def convert_svg_using_inkscape(
     r = subprocess.call(args)
     if r != 0:
         raise Exception(
-            f'conversion from "{svg}" to "{out}" failed')
+            'conversion from '
+            f'"{svg}" to "{out}" failed')
 
 
 def locate(

@@ -523,7 +523,8 @@ def _parse_single_svg_transform(attribute):
         tform = _make_rotation_transform(args)
     else:
         raise Exception(
-            f'unsupported transform attribute ({attribute})')
+            'unsupported transform '
+            f'attribute ({attribute})')
     return tform, m.end()
 
 
@@ -1079,7 +1080,8 @@ class _TeXPicture:
             img = self.background_graphics
             s = (
                 f'\\put({x}, {y}){{'
-                f'\\includegraphics[width={scale}\\unitlength]{{{img}}}'
+                '\\includegraphics['
+                f'width={scale}\\unitlength]{{{img}}}'
                 f'}}%')
             c.append(s)
         for label in self.labels:
