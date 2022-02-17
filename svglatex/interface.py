@@ -50,7 +50,9 @@ def parse_args():
     """Parse command-line arguments using."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-i', '--input-file', type=str,
+        '-i',
+        '--input-file',
+        type=str,
         help=(
             'Name (w/o extension) of SVG file. '
             'Either file name to search for under `./img`, '
@@ -58,7 +60,10 @@ def parse_args():
     choices = [
         'latex-pdf', 'pdf']
     parser.add_argument(
-        '-m', '--method', type=str, choices=choices,
+        '-m',
+        '--method',
+        type=str,
+        choices=choices,
         help=(
             'Export to this file type. '
             'The prefix "latex" produces also a file `*.pdf_tex` '
@@ -106,7 +111,8 @@ def is_newer(target, source):
     return t_src < t_tgt
 
 
-def _print_dates(source, target, t_src, t_tgt):
+def _print_dates(
+        source, target, t_src, t_tgt):
     s = _format_time(t_src)
     t = _format_time(t_tgt)
     log.info(
@@ -142,19 +148,24 @@ def convert_svg(svg, out, out_type):
             svg_path]
         r = subprocess.call(args)
         if r != 0:
-            raise Exception('Conversion error')
+            raise Exception(
+                'Conversion error')
 
 
-def convert_svg_using_inkscape(svg, out, out_type):
+def convert_svg_using_inkscape(
+        svg, out, out_type):
     """Convert from SVG to output format."""
     # inkscape need be called with an absolute path on OS X
     # https://wiki.inkscape.org/wiki/index.php/MacOS_X
     symlink_relpath = 'bin/inkscape'
     home = os.path.expanduser('~')
-    symlink_abspath = os.path.join(home, symlink_relpath)
-    inkscape_abspath = os.path.realpath(symlink_abspath)
+    symlink_abspath = os.path.join(
+        home, symlink_relpath)
+    inkscape_abspath = os.path.realpath(
+        symlink_abspath)
     svg_abspath = os.path.realpath(svg)
-    args = [f'{inkscape_abspath} -z -D --file={svg_abspath}']
+    args = [
+        f'{inkscape_abspath} -z -D --file={svg_abspath}']
     if 'pdf' in out_type:
         args.append(f'--export-pdf={out}')
     if 'eps' in out_type:
@@ -168,7 +179,9 @@ def convert_svg_using_inkscape(svg, out, out_type):
             f'conversion from "{svg}" to "{out}" failed')
 
 
-def locate(pattern, root=os.curdir):
+def locate(
+        pattern,
+        root=os.curdir):
     """Locate all files matching supplied filename pattern under `root`."""
     for path, dirs, files in os.walk(os.path.abspath(root)):
         for filename in fnmatch.filter(files, pattern):

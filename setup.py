@@ -20,7 +20,8 @@ LONG_DESCRIPTION = (
     'https://github.com/johnyf/svglatex')
 url = f'https://github.com/johnyf/{NAME}'
 PROJECT_URLS = {
-    'Bug Tracker': 'https://github.com/johnyf/svglatex/issues'}
+    'Bug Tracker':
+        'https://github.com/johnyf/svglatex/issues'}
 VERSION_FILE = f'{NAME}/_version.py'
 MAJOR = 0
 MINOR = 0
@@ -57,7 +58,9 @@ def git_version(version):
     repo.git.status()
     # assert versions are increasing
     latest_tag = repo.git.describe(
-        match='v[0-9]*', tags=True, abbrev=0)
+        match='v[0-9]*',
+        tags=True,
+        abbrev=0)
     latest_version = pkg_resources.parse_version(latest_tag)
     given_version = pkg_resources.parse_version(version)
     if latest_version > given_version:
@@ -69,8 +72,10 @@ def git_version(version):
     # is it release of `version` ?
     try:
         tag = repo.git.describe(
-            match='v[0-9]*', exact_match=True,
-            tags=True, dirty=True)
+            match='v[0-9]*',
+            exact_match=True,
+            tags=True,
+            dirty=True)
     except git.GitCommandError:
         return f'{version}.dev0+{sha}'
     if tag != 'v' + version:
@@ -108,7 +113,8 @@ def run_setup():
         package_dir={NAME: NAME},
         include_package_data=True,
         entry_points={
-            'console_scripts': ['svglatex = svglatex.interface:main']},
+            'console_scripts': [
+                'svglatex = svglatex.interface:main']},
         classifiers=CLASSIFIERS,
         keywords=[
             'svg', 'latex', 'pdf', 'inkscape',

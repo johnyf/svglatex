@@ -128,7 +128,8 @@ def convert(svg_fname):
     The LaTeX file includes text from the SVG `svg_fname`.
     The LaTeX file has extension `.pdf_tex`.
 
-    @type svg_fname: `str`
+    @type svg_fname:
+        `str`
     """
     fname, ext = os.path.splitext(svg_fname)
     if ext != '.svg':
@@ -151,7 +152,8 @@ def convert(svg_fname):
 def _split_text_graphics(svg_fname):
     """Return XML for graphics SVG and text labels.
 
-    @type svg_fname: `str`
+    @type svg_fname:
+        `str`
     """
     doc = etree.parse(svg_fname)
     _print_svg_units(doc)
@@ -182,7 +184,8 @@ def _split_text_graphics(svg_fname):
 def _print_svg_units(doc):
     """Print `doc` width and height in units.
 
-    @type doc: `lxml.etree._ElementTree`
+    @type doc:
+        `lxml.etree._ElementTree`
     """
     w = _mm_to_svg_units(doc.getroot().attrib['width'])
     h = _mm_to_svg_units(doc.getroot().attrib['height'])
@@ -198,7 +201,8 @@ def _print_svg_units(doc):
 def _mm_to_svg_units(x):
     """Return SVG units from `x`.
 
-    @param x: `str` that may contain `"mm"`
+    @param x:
+        `str` that may contain `"mm"`
     """
     if 'in' in x:
         s = x[:-2]
@@ -245,28 +249,35 @@ def _scaling_assumed(doc):
         # px / viewbox units
         scaling = (
             DPI  # px / in
-            * in_width / viewbox_width)  # * in / viewbox units
+            * in_width / viewbox_width)
+                # * in / viewbox units
     elif 'mm' in width:
         print('mm found')
         mm_width = float(width[:-2])
         # px / viewbox units
         scaling = (
-            DPI / 25.4  # (px / in) * (in / mm) = (px / mm)
-            * mm_width / viewbox_width)  # * mm / viewbox units
+            DPI / 25.4
+                # (px / in) * (in / mm) = (px / mm)
+            * mm_width / viewbox_width)
+                # * mm / viewbox units
     elif 'cm' in width:
         print('cm found')
         cm_width = float(width[:-2])
         # px / viewbox units
         scaling = (
-            DPI / 2.54  # (px / in) * (in / cm) = (px / cm)
-            * cm_width / viewbox_width)  # * cm / viewbox units
+            DPI / 2.54
+                # (px / in) * (in / cm) = (px / cm)
+            * cm_width / viewbox_width)
+                # * cm / viewbox units
     elif 'pt' in width:
         print('pt found')
         pt_width = float(width[:-2])
         # px / viewbox units
         scaling = (
-            1.0 / SVG_UNITS_TO_BIG_POINTS  # px / pt
-            * pt_width / viewbox_width)  # * pt / viewbox units
+            1.0 / SVG_UNITS_TO_BIG_POINTS
+                # px / pt
+            * pt_width / viewbox_width)
+                # * pt / viewbox units
     elif 'pc' in width:
         raise NotImplementedError('pc units')
     elif 'px' in width:
@@ -278,13 +289,18 @@ def _scaling_assumed(doc):
     return scaling
 
 
-def _interpret_svg_text(text_element, labels, scaling):
+def _interpret_svg_text(
+        text_element, labels, scaling):
     """Return text IDs and augment `labels`.
 
-    @type text_element: `lxml.etree._Element`
-    @type labels: `list`
-    @return: text IDs
-    @rtype: `set`
+    @type text_element:
+        `lxml.etree._Element`
+    @type labels:
+        `list`
+    @return:
+        text IDs
+    @rtype:
+        `set`
     """
     if not text_element.tag.endswith('text'):
         raise ValueError(text_element.tag)
@@ -339,7 +355,9 @@ def _make_tex_label(tspan):
 def _get_tspan_pos_angle(tspan):
     """Compute position and orientation of `tspan`."""
     xform = _compute_svg_transform(tspan)
-    pos = (float(tspan.attrib['x']), float(tspan.attrib['y']))
+    pos = (
+        float(tspan.attrib['x']),
+        float(tspan.attrib['y']))
     pos = xform.apply(pos)
     angle = - round(xform.get_rotation(), 3)
     return pos, angle
@@ -387,7 +405,8 @@ def _set_font_style(tex_label, span_style):
         tex_label.fontstyle = _STYLE_OBLIQUE
 
 
-def _set_text_anchor(tex_label, span_style):
+def _set_text_anchor(
+        tex_label, span_style):
     """Assign `tex_label.align` using `span_style`."""
     if 'text-anchor' not in span_style:
         return
@@ -400,7 +419,8 @@ def _set_text_anchor(tex_label, span_style):
         tex_label.align = _ALIGN_CENTER
 
 
-def _set_font_family(tex_label, span_style):
+def _set_font_family(
+        tex_label, span_style):
     """Assign `tex_label.fontfamily` using `span_style`."""
     if 'font-family' not in span_style:
         return
@@ -411,7 +431,8 @@ def _set_font_family(tex_label, span_style):
         print('Could not match font-family', ff)
 
 
-def _set_font_size(tex_label, span_style):
+def _set_font_size(
+        tex_label, span_style):
     """Assign `tex_label.fontsize` using `span_style`."""
     if 'font-size' not in span_style:
         return
@@ -422,7 +443,8 @@ def _set_font_size(tex_label, span_style):
         print('Could not match font-size', fs)
 
 
-def _scale_texlabel(tex_label, scaling):
+def _scale_texlabel(
+        tex_label, scaling):
     x, y = tex_label.pos
     x = x * scaling
     y = y * scaling
@@ -431,8 +453,13 @@ def _scale_texlabel(tex_label, scaling):
 
 def _split_svg_style(style):
     """Return `dict` from parsing `style`."""
-    parts = [x.strip() for x in style.split(';')]
-    parts = [x.partition(':') for x in parts if x != '']
+    parts = [
+        x.strip()
+        for x in style.split(';')]
+    parts = [
+        x.partition(':')
+        for x in parts
+        if x != '']
     st = dict()
     for p in parts:
         st[p[0].strip()] = p[2].strip()
@@ -442,8 +469,10 @@ def _split_svg_style(style):
 def _compute_svg_transform(el):
     """Return transformation of element `el`.
 
-    @type el: `lxml.etree._Element`
-    @rtype: `_AffineTransform`
+    @type el:
+        `lxml.etree._Element`
+    @rtype:
+        `_AffineTransform`
     """
     xform = _AffineTransform()
     while el is not None:
@@ -466,17 +495,24 @@ def _parse_svg_transform(attribute):
 def _parse_single_svg_transform(attribute):
     """Return transformation from `attribute`.
 
-    @type attribute: `str`
-    @rtype: `_AffineTransform`
+    @type attribute:
+        `str`
+    @rtype:
+        `_AffineTransform`
     """
     m = _RX_TRANSFORM.match(attribute)
     if m is None:
-        raise RuntimeError(f'bad transform ({attribute})')
+        raise RuntimeError(
+            f'bad transform ({attribute})')
     func = m.group(1)
     if ',' in m.group(2):
-        args = [float(x.strip()) for x in m.group(2).split(',')]
+        args = [
+            float(x.strip())
+            for x in m.group(2).split(',')]
     else:
-        args = [float(x.strip()) for x in m.group(2).split(' ')]
+        args = [
+            float(x.strip())
+            for x in m.group(2).split(' ')]
     if func == 'matrix':
         tform = _make_matrix_transform(args)
     elif func == 'translate':
@@ -494,8 +530,10 @@ def _parse_single_svg_transform(attribute):
 def _make_matrix_transform(args):
     """Return matrix transformation from `args`.
 
-    @type args: `list` of `float`
-    @rtype: `_AffineTransform`
+    @type args:
+        `list` of `float`
+    @rtype:
+        `_AffineTransform`
     """
     if len(args) != 6:
         raise ValueError(args)
@@ -507,8 +545,10 @@ def _make_matrix_transform(args):
 def _make_translation_transform(args):
     """Return translation from `args`.
 
-    @type args: `list` of `float`
-    @rtype: `_AffineTransform`
+    @type args:
+        `list` of `float`
+    @rtype:
+        `_AffineTransform`
     """
     if len(args) not in (1, 2):
         raise ValueError(args)
@@ -522,8 +562,10 @@ def _make_translation_transform(args):
 def _make_scaling_transform(args):
     """Return scaling from `args`.
 
-    @type args: `list` of `float`
-    @rtype: `_AffineTransform`
+    @type args:
+        `list` of `float`
+    @rtype:
+        `_AffineTransform`
     """
     if len(args) not in (1, 2):
         raise ValueError(args)
@@ -537,13 +579,16 @@ def _make_scaling_transform(args):
 def _make_rotation_transform(args):
     """Return rotation from `args`.
 
-    @type args: `list` of `float`
-    @rtype: `_AffineTransform`
+    @type args:
+        `list` of `float`
+    @rtype:
+        `_AffineTransform`
     """
     if len(args) not in (1, 3):
         raise ValueError(args)
     if len(args) == 1:
-        args = args + [0, 0]  # cx, cy
+        args = args + [0, 0]
+            # cx, cy
     xform = _AffineTransform()
     xform.rotate_degrees(*args)
     print('WARNING: text rotation (not tested)')
@@ -553,11 +598,14 @@ def _make_rotation_transform(args):
 def _parse_svg_color(color):
     """Return RGB integers from Inkscape color.
 
-    @type color: `str`
-    @rtype: `tuple` (triplet)
+    @type color:
+        `str`
+    @rtype:
+        `tuple` (triplet)
     """
     if color[0] != '#':
-        raise Exception('only hash-code colors are supported!')
+        raise Exception(
+            'only hash-code colors are supported!')
     red = int(color[1:3], 16)
     green = int(color[3:5], 16)
     blue = int(color[5:7], 16)
@@ -570,23 +618,31 @@ def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
     This functions uses `inkscape` for both the
     conversion to PDF, and for computing bounding boxes.
 
-    @type svg_data: `lxml.etree._ElementTree`
-    @type pdfpath: `str`
-    @return: bounding boxes
-    @rtype: `dict`
+    @type svg_data:
+        `lxml.etree._ElementTree`
+    @type pdfpath:
+        `str`
+    @return:
+        bounding boxes
+    @rtype:
+        `dict`
     """
     inkscape = which_inkscape()
     path = os.path.realpath(pdfpath)
-    args = [inkscape,
-            '--without-gui',
-            '--export-area-drawing',
-            '--export-ignore-filters',
-            f'--export-dpi={DPI}',
-            f'--export-pdf={path}']
+    args = [
+        inkscape,
+        '--without-gui',
+        '--export-area-drawing',
+        '--export-ignore-filters',
+        f'--export-dpi={DPI}',
+        f'--export-pdf={path}']
     with tempfile.NamedTemporaryFile(
-            suffix='.svg', delete=True) as tmpsvg:
-        svg_data.write(tmpsvg, encoding='utf-8',
-                      xml_declaration=True)
+            suffix='.svg',
+            delete=True) as tmpsvg:
+        svg_data.write(
+            tmpsvg,
+            encoding='utf-8',
+            xml_declaration=True)
         tmpsvg.flush()
         bboxes = _svg_bounding_boxes(tmpsvg.name)
         # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
@@ -602,21 +658,31 @@ def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
     return bboxes
 
 
-def _generate_pdf_from_svg_using_cairo(svg_data, pdfpath):
+def _generate_pdf_from_svg_using_cairo(
+        svg_data, pdfpath):
     """Export SVG `svg_data` to PDF.
 
-    This function uses `cairosvg` for the conversion to PDF,
-    and `inkscape` to compute the bounding boxes.
+    This function uses `cairosvg` for
+    the conversion to PDF,
+    and `inkscape` to compute the
+    bounding boxes.
 
-    @type svg_data: `lxml.etree._ElementTree`
-    @type pdfpath: `str`
-    @return: bounding boxes
-    @rtype: `dict`
+    @type svg_data:
+        `lxml.etree._ElementTree`
+    @type pdfpath:
+        `str`
+    @return:
+        bounding boxes
+    @rtype:
+        `dict`
     """
     with tempfile.NamedTemporaryFile(
-            suffix='.svg', delete=True) as tmpsvg:
-        svg_data.write(tmpsvg, encoding='utf-8',
-                      xml_declaration=True)
+            suffix='.svg',
+            delete=True) as tmpsvg:
+        svg_data.write(
+            tmpsvg,
+            encoding='utf-8',
+            xml_declaration=True)
         tmpsvg.flush()
         bboxes = _svg_bounding_boxes(tmpsvg.name)
         # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
@@ -629,8 +695,10 @@ def _generate_pdf_from_svg_using_cairo(svg_data, pdfpath):
 def _pdf_bounding_box(pdf_bboxes):
     """Return PDF bounding box.
 
-    @type pdf_bboxes: `dict`
-    @rtype: `_BBox`
+    @type pdf_bboxes:
+        `dict`
+    @rtype:
+        `_BBox`
     """
     # Drawing area coordinates within SVG
     for k, d in pdf_bboxes.items():
@@ -646,14 +714,20 @@ def _pdf_bounding_box(pdf_bboxes):
 
 
 def _svg_bounding_box(
-        svg_bboxes, text_ids, ignore_ids, pdf_bbox):
+        svg_bboxes, text_ids,
+        ignore_ids, pdf_bbox):
     """Return initial SVG bounding box.
 
-    @type svg_bboxes: `dict`
-    @type text_ids: `set`
-    @type ignore_ids: `set`
-    @type pdf_bbox: `_BBox`
-    @rtype: `_BBox`
+    @type svg_bboxes:
+        `dict`
+    @type text_ids:
+        `set`
+    @type ignore_ids:
+        `set`
+    @type pdf_bbox:
+        `_BBox`
+    @rtype:
+        `_BBox`
     """
     xs = set()
     ys = set()
@@ -691,8 +765,10 @@ def _svg_bounding_boxes(svgfile):
 
     This function calls `inkscape`.
 
-    @type svgfile: `str`
-    @rtype: `dict`
+    @type svgfile:
+        `str`
+    @rtype:
+        `dict`
     """
     inkscape = which_inkscape()
     path = os.path.realpath(svgfile)
@@ -722,11 +798,13 @@ def which_inkscape():
     """Return absolute path to `inkscape`.
 
     Assume that `inkscape` is in the `$PATH`.
-    Useful on OS X, where calling `inkscape` from the command line does not
-    work properly, unless an absolute path is used.
+    Useful on OS X, where calling `inkscape` from
+    the command line does not work properly,
+    unless an absolute path is used.
 
-    In the future, using another approach for conversion (e.g., a future
-    version of `cairosvg`) will make this function obsolete.
+    In the future, using another approach for
+    conversion (e.g., a future version of
+    `cairosvg`) will make this function obsolete.
     """
     s = shutil.which('inkscape')
     inkscape_abspath = os.path.realpath(s)
@@ -736,22 +814,30 @@ def which_inkscape():
 def _parse_bbox_string(line):
     """Return `x, y, w, h` from bounding box string.
 
-    @type line: `str`
-    @return: quintuple
-    @rtype: `tuple`
+    @type line:
+        `str`
+    @return:
+        quintuple
+    @rtype:
+        `tuple`
     """
     name, *rest = line.split(',')
-    x, y, w, h = [float(x) for x in rest]
+    x, y, w, h = [
+        float(x)
+        for x in rest]
     return name, x, y, w, h
 
 
 def _corners(d):
     """Return corner coordinates.
 
-    @param d: `dict` with keys
+    @param d:
+        `dict` with keys
         `'x', 'y', 'w', 'h'`
-    @return: quadruple
-    @rtype: `tuple`
+    @return:
+        quadruple
+    @rtype:
+        `tuple`
     """
     x = d['x']
     y = d['y']
@@ -765,7 +851,10 @@ def _corners(d):
 class _AffineTransform:
     """Affine transformation."""
 
-    def __init__(self, t=None, m=None):
+    def __init__(
+            self,
+            t=None,
+            m=None):
         self.t = (0.0, 0.0) if t is None else t
         self.m = (1.0, 0.0, 0.0, 1.0) if m is None else m
 
@@ -775,11 +864,15 @@ class _AffineTransform:
         nt.m = self.m
         return nt
 
-    def translate(self, tx, ty):
+    def translate(
+            self, tx, ty):
         """Create translation."""
         self.matrix(1.0, 0.0, 0.0, 1.0, tx, ty)
 
-    def rotate_degrees(self, angle, cx=0.0, cy=0.0):
+    def rotate_degrees(
+            self, angle,
+            cx=0.0,
+            cy=0.0):
         """Create rotation."""
         angle = math.radians(angle)
         sin, cos = math.sin(angle), math.cos(angle)
@@ -790,13 +883,18 @@ class _AffineTransform:
         else:
             self.matrix(cos, sin, -sin, cos, 0.0, 0.0)
 
-    def scale(self, sx, sy=None):
+    def scale(
+            self, sx,
+            sy=None):
         """Create scaling."""
         if sy is None:
             sy = sx
         self.matrix(sx, 0.0, 0.0, sy)
 
-    def matrix(self, a, b, c, d, e=0.0, f=0.0):
+    def matrix(
+            self, a, b, c, d,
+            e=0.0,
+            f=0.0):
         """Create matrix transformation."""
         sa, sb, sc, sd = self.m
         se, sf = self.t
@@ -810,7 +908,9 @@ class _AffineTransform:
         self.m = (ma, mb, mc, md)
         self.t = (me, mf)
 
-    def apply(self, x, y=None):
+    def apply(
+            self, x,
+            y=None):
         """Transform position `x, y`."""
         if y is None:
             x, y = x
@@ -821,8 +921,12 @@ class _AffineTransform:
     def __str__(self):
         """Return `str` representation."""
         return '[{a},{b},{c}  ;  {d},{e},{f}]'.format(
-            a=self.m[0], b=self.m[2], c=self.t[0],
-            d=self.m[1], e=self.m[3], f=self.t[1])
+            a=self.m[0],
+            b=self.m[2],
+            c=self.t[0],
+            d=self.m[1],
+            e=self.m[3],
+            f=self.t[1])
 
     def __mul__(a, b):
         """Compose transformations."""
@@ -838,7 +942,9 @@ class _AffineTransform:
         c21 = a21 * b11 + a22 * b21
         c22 = a21 * b12 + a22 * b22
         c23 = a21 * b13 + a22 * b23 + a23
-        return _AffineTransform((c13, c23), (c11, c21, c12, c22))
+        return _AffineTransform(
+            (c13, c23),
+            (c11, c21, c12, c22))
 
     def get_rotation(self):
         """Return angle in degrees."""
@@ -854,7 +960,8 @@ class _AffineTransform:
 class _TeXLabel:
     """LaTeX label."""
 
-    def __init__(self, pos, text):
+    def __init__(
+            self, pos, text):
         self.text = text
         self.color = (0, 0, 0)
         self.pos = pos
@@ -939,7 +1046,8 @@ class _TeXPicture:
 
     def __init__(
             self, svg_bbox, pdf_bbox,
-            fname=None, labels=None):
+            fname=None,
+            labels=None):
         self.svg_bbox = svg_bbox
         self.pdf_bbox = pdf_bbox
         self.background_graphics = fname
@@ -961,8 +1069,12 @@ class _TeXPicture:
             # is at the top left corner
             # whereas the `picture` origin is
             # at the lower left corner
-            y = (h + ymin) - (self.pdf_bbox.height + self.pdf_bbox.y)
-            x, y = _round(x, y, unit=unit)
+            y = (h + ymin) - (
+                self.pdf_bbox.height
+                + self.pdf_bbox.y)
+            x, y = _round(
+                x, y,
+                unit=unit)
             scale = self.pdf_bbox.width / unit
             img = self.background_graphics
             s = (
@@ -976,11 +1088,15 @@ class _TeXPicture:
             # bottom in `\picture`
             x = x - xmin
             y = (h + ymin) - y
-            x, y = _round(x, y, unit=unit)
+            x, y = _round(
+                x, y,
+                unit=unit)
             text = label.texcode()
             s = f'\\put({x}, {y}){{{text}}}%'
             c.append(s)
-        width, height = _round(w, h, unit=unit)
+        width, height = _round(
+            w, h,
+            unit=unit)
         if width != 1:
             raise ValueError(width)
         s = (
@@ -998,9 +1114,12 @@ class _TeXPicture:
         self.labels.append(label)
 
 
-def _round(*args, unit=1):
+def _round(
+        *args, unit=1):
     """Return `args` normalized by `unit` and rounded."""
-    return tuple(round(x / unit, 3) for x in args)
+    return tuple(
+        round(x / unit, 3)
+        for x in args)
 
 
 if __name__ == '__main__':
