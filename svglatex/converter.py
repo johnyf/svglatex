@@ -2,8 +2,8 @@
 """Export SVG to PDF + LaTeX."""
 #
 # Based on:
-# https://github.com/johnbartholomew/svg2latex/blob/
-# b77623b617b9b92c131a8eafe09ec1b1abed93f2/svg2latex.py
+# <https://github.com/johnbartholomew/svg2latex/blob/
+# b77623b617b9b92c131a8eafe09ec1b1abed93f2/svg2latex.py>
 #
 # BSD 3-Clause License
 #
@@ -67,7 +67,7 @@ _FONT_SIZE_MAP = {
 # 72 big-points (PostScript points) (72 bp) per inch
 PT_PER_INCH = 72.0  # pt / in
 # 96 SVG "User Units" (96 px) per inch
-# https://wiki.inkscape.org/wiki/index.php/Units_In_Inkscape
+# <https://wiki.inkscape.org/wiki/index.php/Units_In_Inkscape>
 DPI = 96.0  # px / in
 SVG_UNITS_TO_BIG_POINTS = PT_PER_INCH / DPI  # pt / px
 # initial fragment of `*.pdf_tex` file
