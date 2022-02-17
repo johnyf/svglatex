@@ -14,20 +14,26 @@
 %
 % These commands require:
 % - invoking LaTeX with the option `--shell-escape'.
-% - Inkscape: https://inkscape.org
-% - the Python package SVGLaTeX: https://github.com/johnyf/svglatex
+% - Inkscape: <https://inkscape.org>
+% - the Python package SVGLaTeX:
+%   <https://github.com/johnyf/svglatex>
 %
 %
 % Copyright 2009-2022 by Ioannis Filippidis
 % All rights reserved. Licensed under BSD-2.
 %
-% Author's email: jfilippidis@gmail.com
+% Author's email: <jfilippidis@gmail.com>
 %
-\usepackage{graphicx}  % \includegraphics
-\usepackage{mdframed}  % \begin{mdframed}
-\usepackage{xcolor}  % \color
-\usepackage{xifthen}  % \ifthenelse
-\usepackage{url}  % \urlstyle
+\usepackage{graphicx}
+    % \includegraphics
+\usepackage{mdframed}
+    % \begin{mdframed}
+\usepackage{xcolor}
+    % \color
+\usepackage{xifthen}
+    % \ifthenelse
+\usepackage{url}
+    % \urlstyle
 
 
 \DeclareOptionX{demo}[]{\def\mycmd@demo{1}}
@@ -43,7 +49,7 @@
 % \includesvg[width=0.5\textwidth,tex]{relative_path}
 % \includesvg[width=0.5\textwidth,tex=true]{relative_path}
 %
-%	or
+% or
 %
 % \includesvg[width=0.5\textwidth,tex=false]{filename}
 %
