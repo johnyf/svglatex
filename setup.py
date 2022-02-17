@@ -94,8 +94,8 @@ def run_setup():
         print('No git info: Assume release.')
         version = VERSION
     s = VERSION_TEXT.format(version=version)
-    with open(VERSION_FILE, 'w') as f:
-        f.write(s)
+    with open(VERSION_FILE, 'w') as fd:
+        fd.write(s)
     setuptools.setup(
         name=NAME,
         version=version,
