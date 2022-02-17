@@ -7,9 +7,9 @@
 #
 # BSD 3-Clause License
 #
-# Copyright 2017-2020 by California Institute of Technology
+# Copyright 2017-2022 by California Institute of Technology
 # Copyright (c) 2017, John Bartholomew
-# Copyright 2017-2020 by Ioannis Filippidis
+# Copyright 2017-2022 by Ioannis Filippidis
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
