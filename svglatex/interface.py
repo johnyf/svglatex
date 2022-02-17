@@ -21,7 +21,7 @@ import time
 
 import humanize
 
-from svglatex import converter
+import svglatex.converter as _converter
 
 
 log = logging.getLogger(__name__)
@@ -126,9 +126,9 @@ def convert_svg(svg, out, out_type):
     if out_type not in ('latex-pdf', 'pdf'):
         raise ValueError(out_type)
     if out_type == 'latex-pdf':
-        converter.convert(svg)
+        _converter.convert(svg)
     elif out_type == 'pdf':
-        inkscape = converter.which_inkscape()
+        inkscape = _converter.which_inkscape()
         svg_path = os.path.realpath(svg)
         out_path = os.path.realpath(out)
         dpi = 96

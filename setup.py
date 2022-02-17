@@ -1,6 +1,6 @@
 """Installation script."""
-from setuptools import setup
-from pkg_resources import parse_version
+import setuptools
+import pkg_resources
 
 # inline:
 # import git
@@ -58,7 +58,9 @@ def git_version(version):
     # assert versions are increasing
     latest_tag = repo.git.describe(
         match='v[0-9]*', tags=True, abbrev=0)
-    if parse_version(latest_tag) > parse_version(version):
+    latest_version = pkg_resources.parse_version(latest_tag)
+    given_version = pkg_resources.parse_version(version)
+    if latest_version > given_version:
         raise ValueError((latest_tag, version))
     sha = repo.head.commit.hexsha
     if repo.is_dirty():
@@ -89,7 +91,7 @@ def run_setup():
     s = VERSION_TEXT.format(version=version)
     with open(VERSION_FILE, 'w') as f:
         f.write(s)
-    setup(
+    setuptools.setup(
         name=NAME,
         version=version,
         description=DESCRIPTION,
