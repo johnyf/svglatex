@@ -80,9 +80,9 @@ def convert_if_svg_newer(svg, out_type):
     if ext != '.svg':
         raise ValueError(ext)
     if 'pdf' in out_type:
-        out = base + '.pdf'
+        out = f'{base}.pdf'
     elif 'eps' in out_type:
-        out = base + '.eps'
+        out = f'{base}.eps'
     else:
         raise ValueError(out_type)
     if not os.access(svg, os.F_OK):
@@ -90,7 +90,7 @@ def convert_if_svg_newer(svg, out_type):
             f'No SVG file "{svg}"')
     fresh = is_newer(out, svg)
     if out_type == 'latex-pdf':
-        pdf_tex = base + '.pdf_tex'
+        pdf_tex = f'{base}.pdf_tex'
         fresh &= is_newer(pdf_tex, svg)
     if fresh:
         log.info('No update needed, target newer than SVG.')

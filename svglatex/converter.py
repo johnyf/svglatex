@@ -237,7 +237,7 @@ def _scaling_assumed(doc):
             viewbox = viewbox.split(',')
         else:
             viewbox = viewbox.split(' ')
-    print('viewbox:' + str(viewbox))
+    print(f'viewbox:{viewbox}')
     if viewbox is None:
         scaling = 1.0
         return scaling
@@ -976,7 +976,7 @@ class _TeXLabel:
     def texcode(self):
         """Return LaTeX code."""
         color = self._color_tex()
-        font = '\\' + self.fontfamily + 'family'
+        font = f'\\{self.fontfamily}family'
         font += self._font_weight_tex()
         font += self._font_style_tex()
         font += self._font_size_tex()
