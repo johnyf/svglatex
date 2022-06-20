@@ -1,6 +1,6 @@
 """Installation script."""
 import setuptools
-import pkg_resources
+import pkg_resources as _pkg
 
 # inline:
 # import git
@@ -60,8 +60,8 @@ def git_version(version):
         match='v[0-9]*',
         tags=True,
         abbrev=0)
-    latest_version = pkg_resources.parse_version(latest_tag)
-    given_version = pkg_resources.parse_version(version)
+    latest_version = _pkg.parse_version(latest_tag)
+    given_version = _pkg.parse_version(version)
     if latest_version > given_version:
         raise ValueError((latest_tag, version))
     sha = repo.head.commit.hexsha
