@@ -108,7 +108,16 @@ _INKSVG_NAMESPACES = {
                  r'DTD/sodipodi-0.dtd'),
     'inkscape': r'http://www.inkscape.org/namespaces/inkscape'}
 # transform re
-_RX_TRANSFORM = re.compile(r'^\s*(\w+)\(([0-9,\s\.-]*)\)\s*')
+_RX_TRANSFORM = re.compile(
+    r'''
+    ^ \s*
+    (\w+)
+    \(
+        ([0-9,\s\.-]*)
+    \)
+    \s*
+    ''',
+    flags=re.VERBOSE)
 # bounding box
 _BBox = collections.namedtuple('BBox', ['x', 'y', 'width', 'height'])
 
