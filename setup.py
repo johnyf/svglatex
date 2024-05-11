@@ -32,7 +32,6 @@ VERSION_TEXT = (
     "version = '{version}'\n")
 
 INSTALL_REQUIRES = [
-    'humanize >= 2.6.0',
     'lxml >= 3.7.2',
     ]
 TESTS_REQUIRE = [

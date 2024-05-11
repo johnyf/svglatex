@@ -19,8 +19,6 @@ import shlex
 import subprocess
 import time
 
-import humanize
-
 import svglatex.converter as _converter
 
 
@@ -130,8 +128,8 @@ def _print_dates(
 
 def _format_time(t):
     """Return time readable by humans."""
-    return humanize.naturaltime(
-        datetime.datetime.fromtimestamp(t))
+    return datetime.datetime.fromtimestamp(
+        t).isoformat()
 
 
 def convert_svg(svg, out, out_type):
