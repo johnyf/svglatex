@@ -23,10 +23,7 @@ PROJECT_URLS = {
     'Bug Tracker':
         'https://github.com/johnyf/svglatex/issues'}
 VERSION_FILE = f'{NAME}/_version.py'
-MAJOR = 0
-MINOR = 0
-MICRO = 3
-VERSION = f'{MAJOR}.{MINOR}.{MICRO}'
+VERSION = '0.0.3'
 VERSION_TEXT = (
     '# This file was generated from setup.py\n'
     "version = '{version}'\n")
