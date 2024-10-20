@@ -143,14 +143,16 @@ def convert_svg(svg, out, out_type):
         svg_path = os.path.realpath(svg)
         out_path = os.path.realpath(out)
         dpi = 96
-        args = [
-            inkscape,
-            '--without-gui',
-            '--export-area-drawing',
-            '--export-ignore-filters',
-            f'--export-dpi={dpi}',
-            f'--export-pdf={out_path}',
-            svg_path]
+        args = f'''
+            {inkscape}
+                --without-gui
+                --export-area-drawing
+                --export-ignore-filters
+                --export-dpi={dpi}
+                --export-pdf={out_path}
+                {svg_path}
+            '''
+        args = shlex.split(args)
         r = subprocess.call(args)
         if r != 0:
             raise Exception(
@@ -169,15 +171,22 @@ def convert_svg_using_inkscape(
     inkscape_abspath = os.path.realpath(
         symlink_abspath)
     svg_abspath = os.path.realpath(svg)
-    args = [
-        f'{inkscape_abspath} -z -D --file={svg_abspath}']
+    args = list()
     if 'pdf' in out_type:
         args.append(f'--export-pdf={out}')
     if 'eps' in out_type:
         args.append(f'--export-eps={out}')
     if 'latex' in out_type:
         args.append('--export-latex')
-    args = shlex.split(' '.join(args))
+    args = ' '.join(args)
+    args = f'''
+        {inkscape_abspath}
+            -z
+            -D
+            {args}
+            --file={svg_abspath}
+        '''
+    args = shlex.split(args)
     r = subprocess.call(args)
     if r != 0:
         raise Exception(
