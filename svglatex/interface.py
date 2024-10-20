@@ -181,8 +181,8 @@ def convert_svg_using_inkscape(
     args = ' '.join(args)
     args = f'''
         {inkscape_abspath}
-            -z
-            -D
+            --without-gui
+            --export-area-drawing
             {args}
             --file={svg_abspath}
         '''
