@@ -641,11 +641,10 @@ def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
     path = os.path.realpath(pdfpath)
     args = [
         inkscape,
-        '--without-gui',
         '--export-area-drawing',
         '--export-ignore-filters',
         f'--export-dpi={DPI}',
-        f'--export-pdf={path}']
+        f'--export-filename={path}']
     with tempfile.NamedTemporaryFile(
             suffix='.svg',
             delete=True) as tmpsvg:
@@ -657,7 +656,7 @@ def _generate_pdf_from_svg_using_inkscape(svg_data, pdfpath):
         bboxes = _svg_bounding_boxes(tmpsvg.name)
         # shutil.copyfile(tmpsvg.name, 'foo_bare.svg')
         tmp_path = os.path.realpath(tmpsvg.name)
-        args.append(f'--file={tmp_path}')
+        args.append(tmp_path)
         with subprocess.Popen(args) as proc:
             proc.wait()
             if proc.returncode != 0:
@@ -784,9 +783,8 @@ def _svg_bounding_boxes(svgfile):
     path = os.path.realpath(svgfile)
     args = [
         inkscape,
-        '--without-gui',
         '--query-all',
-        f'--file={path}']
+        path]
     with subprocess.Popen(
             args,
             stdout=subprocess.PIPE,

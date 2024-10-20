@@ -48,7 +48,8 @@ def main():
 
 def parse_args():
     """Parse command-line arguments using."""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='Requires `inkscape >= 1.0.0`')
     parser.add_argument(
         '-i',
         '--input-file',
@@ -145,11 +146,10 @@ def convert_svg(svg, out, out_type):
         dpi = 96
         args = f'''
             {inkscape}
-                --without-gui
                 --export-area-drawing
                 --export-ignore-filters
                 --export-dpi={dpi}
-                --export-pdf={out_path}
+                --export-filename={out_path}
                 {svg_path}
             '''
         args = shlex.split(args)
@@ -173,18 +173,17 @@ def convert_svg_using_inkscape(
     svg_abspath = os.path.realpath(svg)
     args = list()
     if 'pdf' in out_type:
-        args.append(f'--export-pdf={out}')
+        args.append(f'--export-filename={out}')
     if 'eps' in out_type:
-        args.append(f'--export-eps={out}')
+        args.append(f'--export-filename={out}')
     if 'latex' in out_type:
         args.append('--export-latex')
     args = ' '.join(args)
     args = f'''
         {inkscape_abspath}
-            --without-gui
             --export-area-drawing
             {args}
-            --file={svg_abspath}
+            {svg_abspath}
         '''
     args = shlex.split(args)
     r = subprocess.call(args)
