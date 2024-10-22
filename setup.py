@@ -30,8 +30,6 @@ VERSION_TEXT = (
 INSTALL_REQUIRES = [
     'lxml >= 3.7.2',
     ]
-TESTS_REQUIRE = [
-    ]
 CLASSIFIERS = [
     'Development Status :: 2 - Pre-Alpha',
     'Intended Audience :: Developers',
@@ -115,7 +113,6 @@ def run_setup():
         license='BSD',
         python_requires='>=3.8',
         install_requires=INSTALL_REQUIRES,
-        tests_require=TESTS_REQUIRE,
         packages=[NAME],
         package_dir={NAME: NAME},
         include_package_data=True,
