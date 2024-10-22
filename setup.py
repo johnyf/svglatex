@@ -1,6 +1,5 @@
 """Installation script."""
 import setuptools
-import pkg_resources as _pkg
 
 # inline:
 # import git
@@ -57,8 +56,8 @@ def git_version(version):
         match='v[0-9]*',
         tags=True,
         abbrev=0)
-    latest_version = _pkg.parse_version(latest_tag)
-    given_version = _pkg.parse_version(version)
+    latest_version = _parse_version(latest_tag[1:])
+    given_version = _parse_version(version)
     if latest_version > given_version:
         raise ValueError((latest_tag, version))
     sha = repo.head.commit.hexsha
@@ -77,6 +76,18 @@ def git_version(version):
     if tag != 'v' + version:
         raise ValueError((tag, version))
     return version
+
+
+def _parse_version(
+        version:
+            str
+        ) -> tuple[
+            int, int, int]:
+    """Return numeric version."""
+    numerals = version.split('.')
+    if len(numerals) != 3:
+        raise ValueError(numerals)
+    return tuple(map(int, numerals))
 
 
 def run_setup():
