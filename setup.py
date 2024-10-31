@@ -9,14 +9,14 @@ NAME = 'svglatex'
 DESCRIPTION = (
     'Include Inkscape graphics in LaTeX.')
 LONG_DESCRIPTION = (
-    'svglatex is a package for including SVG graphics in LaTeX documents '
+    '`svglatex` is a package for including SVG graphics in LaTeX documents '
     'via Inkscape. A script converts an SVG file to a PDF file that '
     'contains only graphics, and a text file that includes LaTeX code '
     'for typesetting the text of the SVG file. So the script '
     'separates text from graphics, and overlays the text, typeset with LaTeX, '
     'on the PDF.'
     'More details can be found in the README at: '
-    'https://github.com/johnyf/svglatex')
+    '<https://github.com/johnyf/svglatex>')
 url = f'https://github.com/johnyf/{NAME}'
 PROJECT_URLS = {
     'Bug Tracker':
@@ -106,6 +106,7 @@ def run_setup():
         version=version,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        long_description_content_type='text/markdown',
         author='Ioannis Filippidis',
         author_email='jfilippidis@gmail.com',
         url=url,
