@@ -112,6 +112,7 @@ def run_setup():
         url=url,
         project_urls=PROJECT_URLS,
         license='BSD',
+        license_files=['LICENSE'],
         python_requires='>=3.8',
         install_requires=INSTALL_REQUIRES,
         packages=[NAME],
